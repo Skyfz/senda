@@ -19,10 +19,10 @@ export default function AccountClient({
 
   return (
     <div className="">
-      <Card className='w-full'>
+      <Card className='w-full px-6'>
         <CardHeader className='flex'>
           <div className='flex-col w-full '>
-            <div className='w-full pb-4'>
+            <div className='w-full py-4'>
               <span className={subtitle()}>Account</span>
             </div>
             <div className='w-full'>

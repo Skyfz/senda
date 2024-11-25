@@ -4,6 +4,8 @@ import { Avatar } from "@nextui-org/avatar";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/dropdown";
 import { useUser } from '@/context/user-context';
 import SignOut from "@/components/sign-out";
+import { Link } from "@nextui-org/link";
+import { auth } from "@/auth"
 
 interface AvatarDropdownProps {
   className?: string;
@@ -21,7 +23,7 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
           isBordered 
           color="primary" 
           src={globalUser?.image}
-          name={globalUser?.name || "User"}
+          name={globalUser?.name || "X"}
           data-dropdown-trigger="true"
         />
       </DropdownTrigger>
@@ -30,8 +32,8 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
         className="w-[240px]"
         closeOnSelect={false}
       >
-        <DropdownItem key="profile" className="h-18 gap-2">
-          <div className="flex flex-col gap-1">
+        <DropdownItem key="profile" className="h-18 gap-2" href="/account">
+          <div className="flex flex-col gap-1 cursor-pointer">
             <p className="font-medium text-default-600 text-small">
               {globalUser?.name}
             </p>
