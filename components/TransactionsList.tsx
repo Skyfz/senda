@@ -35,8 +35,8 @@ export default function TransactionsList() {
       <CardBody className="py-5 px-6">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-lg font-semibold">Recent Activity</h2>
-            <p className="text-sm text-default-500">Today's transactions</p>
+            <h2 className="text-lg font-semibold">Recent&nbsp;Activity</h2>
+            <p className="text-sm text-default-500">Today&apos;s&nbsp;transactions</p>
           </div>
           <div className="flex gap-2">
             <Button
