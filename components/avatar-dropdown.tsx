@@ -22,7 +22,7 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
           className={`${className} transition-transform`}
           isBordered 
           color="primary" 
-          src={globalUser?.image}
+          src={globalUser?.image || ""}
           data-dropdown-trigger="true"
         />
       </DropdownTrigger>
@@ -31,13 +31,13 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
         className="w-[240px]"
         closeOnSelect={false}
       >
-        <DropdownItem key="profile" className="h-18 gap-2" href="/account">
+        <DropdownItem key="profile" className="h-18 gap-2 pb-4" href="/account">
           <div className="flex flex-col gap-1 cursor-pointer">
             <p className="font-medium text-default-600 text-small">
-              {globalUser?.name}
+              {globalUser?.name || "No User"}
             </p>
             <p className="text-default-500 text-tiny">
-              {globalUser?.email}
+              {globalUser?.email || "Sign in to access your account"}
             </p>
           </div>
         </DropdownItem>
