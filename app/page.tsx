@@ -3,6 +3,7 @@ import React from 'react';
 import {
   Card,
   CardBody,
+  CardFooter,
   Button,
   Avatar,
   User,
@@ -10,7 +11,9 @@ import {
   ScrollShadow,
   Divider,
 } from "@nextui-org/react";
-
+import { Link } from '@nextui-org/link';
+import { useUser } from '@/context/user-context';
+import Image from 'next/image';
 import { Send, Wallet, TrendingUp } from 'lucide-react';
 
 export default function Home() {
@@ -33,7 +36,11 @@ export default function Home() {
       <div className="flex items-center justify-center w-full">
       <div className="max-w-lg w-full space-y-4">
         {/* Balance Card */}
-        <Card className="bg-gradient-to-br from-primary-200 to-green-300">
+        <Card 
+        isBlurred
+        shadow="sm"
+        className="bg-gradient-to-br from-primary-200 to-green-300"
+        >
           <CardBody className="py-8">
             <div className="text-foreground">
               <p className="text-sm opacity-90 pl-4 pb-4">Available Balance</p>
@@ -66,7 +73,11 @@ export default function Home() {
           </Button>
         </div>
         {/* Recent Contacts */}
-        <Card>
+        <Card
+        isBlurred
+        className="border-none bg-background/60 dark:bg-default-100/50 max-w-[610px]"
+        shadow="sm"
+        >
           <CardBody>
             <h2 className="text-lg font-semibold m-2 pb-1">Recent Contacts</h2>
             <Divider orientation="horizontal" />
@@ -82,8 +93,13 @@ export default function Home() {
             </ScrollShadow>
           </CardBody>
         </Card>
+
         {/* Recent Transactions */}
-        <Card>
+        <Card 
+          isBlurred
+          className="border-none bg-background/60 dark:bg-default-100/50 max-w-[610px]"
+          shadow="sm"
+        >
           <CardBody>
             <h2 className="text-lg font-semibold m-2 pb-1">Recent Activity</h2>
             <Divider orientation="horizontal" />
