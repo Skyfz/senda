@@ -23,7 +23,6 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
           isBordered 
           color="primary" 
           src={globalUser?.image}
-          // name={globalUser?.name || "X"}
           data-dropdown-trigger="true"
         />
       </DropdownTrigger>

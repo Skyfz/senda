@@ -1,20 +1,10 @@
 "use client";
 import React from 'react';
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  Button,
-  Avatar,
-  User,
-  Chip,
-  ScrollShadow,
-  Divider,
-} from "@nextui-org/react";
-import { Link } from '@nextui-org/link';
-import { useUser } from '@/context/user-context';
-import Image from 'next/image';
-import { Send, Wallet, TrendingUp } from 'lucide-react';
+import Header from '@/components/Header';
+import BalanceCard from '@/components/BalanceCard';
+import ActionButtons from '@/components/ActionButtons';
+import RecentContacts from '@/components/RecentContacts';
+import TransactionsList from '@/components/TransactionsList';
 
 export default function Home() {
 
@@ -33,96 +23,25 @@ export default function Home() {
 
   return (
     <section className="flex flex-col items-center justify-center">
-      <div className="flex items-center justify-center w-full">
-      <div className="max-w-lg w-full space-y-4">
-        {/* Balance Card */}
-        <Card 
-        isBlurred
-        shadow="sm"
-        className="bg-gradient-to-br from-primary-200 to-green-300"
-        >
-          <CardBody className="py-8">
-            <div className="text-foreground">
-              <p className="text-sm opacity-90 pl-4 pb-4">Available Balance</p>
-              <h1 className="text-4xl font-bold pl-4">R 1,234.56</h1>
-            </div>
-          </CardBody>
-        </Card>
-        {/* Quick Actions */}
-        <div className="grid grid-cols-3 gap-4">
-          <Button
-            startContent={<Send size={20} />}
-            variant="light"
-            className="h-20 bg-gradient-to-br from-primary-100 to-primary-400"
-          >
-            Send
-          </Button>
-          <Button
-            startContent={<Wallet size={20} />}
-            variant="light"
-            className="h-20 bg-gradient-to-br from-primary-100 to-primary-400"
-          >
-            Request
-          </Button>
-          <Button
-            startContent={<TrendingUp size={20} />}
-            variant="light"
-            className="h-20 bg-gradient-to-br from-primary-100 to-primary-400"
-          >
-            Invest
-          </Button>
-        </div>
-        {/* Recent Contacts */}
-        <Card
-        isBlurred
-        className="border-none bg-background/60 dark:bg-default-100/50 max-w-[610px]"
-        shadow="sm"
-        >
-          <CardBody>
-            <h2 className="text-lg font-semibold m-2 pb-1">Recent Contacts</h2>
-            <Divider orientation="horizontal" />
-            <ScrollShadow className="flex gap-2 m-2">
-              {recentContacts.map((contact, index) => (
-                <Avatar
-                  key={index}
-                  src={contact.img}
-                  size="lg"
-                  className="cursor-pointer"
-                />
-              ))}
-            </ScrollShadow>
-          </CardBody>
-        </Card>
+      
+      <div className="min-h-screen">
 
-        {/* Recent Transactions */}
-        <Card 
-          isBlurred
-          className="border-none bg-background/60 dark:bg-default-100/50 max-w-[610px]"
-          shadow="sm"
-        >
-          <CardBody>
-            <h2 className="text-lg font-semibold m-2 pb-1">Recent Activity</h2>
-            <Divider orientation="horizontal" />
-            <div className="space-y-4 m-2 ">
-              {transactions.map((tx, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <User
-                    name={tx.to || tx.from}
-                    avatarProps={{
-                      src: `https://i.pravatar.cc/150?u=a042581f4e29026${index}04d`
-                    }}
-                  />
-                  <Chip
-                    color={tx.type === "Received" ? "success" : "default"}
-                    variant="flat"
-                  >
-                    {tx.amount}
-                  </Chip>
-                </div>
-              ))}
+      {/* Main content */}
+      <div className="relative max-w-md mx-auto">
+        <div className="pt-2 pb-4">
+          <div>
+            <Header />
+            <div className="mt-4">
+              <BalanceCard />
             </div>
-          </CardBody>
-        </Card>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <ActionButtons />
+          <RecentContacts />
+          <TransactionsList />
+        </div>
       </div>
     </div>
 

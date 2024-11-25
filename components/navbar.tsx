@@ -97,14 +97,13 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
-        <AvatarDropdown className=""/>
+        <AvatarDropdown/>
         </NavbarItem>
         <NavbarMenuToggle className="hidden md:block lg:hidden"/>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
         <ThemeSwitch />
-        <AvatarDropdown className=""/>
         <NavbarMenuToggle />
       </NavbarContent>
 

@@ -41,6 +41,13 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+
+          {/* Decorative blur elements */}
+          <div className="fixed inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-30 -right-40 w-96 h-96 bg-gradient-to-tr from-blue-400 to-pink-600 rounded-full blur-3xl opacity-20" />
+            <div className="absolute top-1/2 -left-40 w-96 h-96 bg-gradient-to-bl from-purple-600 to-sky-600 rounded-full blur-3xl opacity-30" />
+          </div>
+
           <div className="relative flex flex-col h-screen">
             <Navbar />
             <main className="container mx-auto max-w-7xl pt-2 px-6 flex-grow">
