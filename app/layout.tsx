@@ -44,8 +44,10 @@ export default function RootLayout({
 
           {/* Decorative blur elements */}
           <div className="fixed inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-30 -right-40 w-96 h-96 bg-gradient-to-tr from-blue-400 to-pink-600 rounded-full blur-3xl opacity-20" />
-            <div className="absolute top-1/2 -left-40 w-96 h-96 bg-gradient-to-bl from-purple-600 to-sky-600 rounded-full blur-3xl opacity-30" />
+            <div className="absolute top-1/2 right-1/2 w-96 h-96 bg-gradient-to-tr from-orange-500 to-rose-600 rounded-full blur-3xl opacity-20" />
+            <div className="absolute bottom-1/2 left-1/2 w-96 h-96 bg-gradient-to-bl from-emerald-500 to-cyan-600 rounded-full blur-3xl opacity-30" />
+            <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-tr from-violet-500 to-indigo-600 rounded-full blur-3xl opacity-20" />
+            <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-gradient-to-bl from-teal-500 to-blue-600 rounded-full blur-3xl opacity-30" />
           </div>
 
           <div className="relative flex flex-col h-screen">

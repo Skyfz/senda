@@ -93,13 +93,13 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
-        <ThemeSwitch />
+          <ThemeSwitch />
+          </NavbarItem>
+          <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+          <NavbarItem className="hidden md:flex">
+          <AvatarDropdown/>
         </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-        <AvatarDropdown/>
-        </NavbarItem>
-        <NavbarMenuToggle className="hidden md:block lg:hidden"/>
+        <NavbarMenuToggle className="md:block lg:hidden"/>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
