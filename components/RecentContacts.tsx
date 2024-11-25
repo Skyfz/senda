@@ -12,7 +12,7 @@ export default function RecentContacts() {
   ];
 
   return (
-    <Card>
+    <Card className="bg-opacity-50">
       <CardBody className="py-5 px-4">
         <div className="flex justify-between items-center mb-4">
           <div>

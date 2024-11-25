@@ -31,7 +31,7 @@ export default function TransactionsList() {
   ];
 
   return (
-    <Card >
+    <Card className="bg-opacity-50">
       <CardBody className="py-5 px-6">
         <div className="flex justify-between items-center mb-8">
           <div>
