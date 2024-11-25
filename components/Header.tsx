@@ -12,7 +12,7 @@ export default function Header() {
         <h2 className="text-white/80 text-sm font-medium">Welcome&nbsp;back</h2>
       </div>
       <div className="flex items-center gap-6">
-        <AvatarDropdown className=""/>
+        {/* <AvatarDropdown className=""/> */}
         <button className="p-2 rounded-full bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-all">
           <Bell size={30} />
         </button>
