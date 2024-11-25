@@ -53,8 +53,8 @@ export default function RootLayout({
                 href="https://skyfz.github.io"
                 title="nextui.org homepage"
               >
-                <span className="text-default-600">Powered by</span>
-                <p className="text-primary">Skypoint</p>
+                <span className="text-default-600 text-xs">Powered by</span>
+                <p className="text-primary text-xs">Skypoint</p>
               </Link>
             </footer>
           </div>
