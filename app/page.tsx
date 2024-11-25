@@ -22,28 +22,27 @@ export default function Home() {
   ];
 
   return (
-    <section className="flex flex-col items-center justify-center">
-      
-      <div className="min-h-screen">
+    <section className="flex flex-col w-full items-center justify-center">
 
-      {/* Main content */}
-      <div className="relative max-w-md mx-auto">
-        <div className="pt-2 pb-4">
-          <div>
-            <Header />
-            <div className="mt-4">
-              <BalanceCard />
+      <div className="min-h-screen w-full max-w-2xl">
+        {/* Main content */}
+        <div className="">
+          <div className="pt-2 pb-4">
+            <div>
+              <Header />
+              <div className="mt-4">
+                <BalanceCard />
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div className="space-y-4">
-          <ActionButtons />
-          <RecentContacts />
-          <TransactionsList />
+          
+          <div className="space-y-4">
+            <ActionButtons />
+            <RecentContacts />
+            <TransactionsList />
+          </div>
         </div>
       </div>
-    </div>
 
     </section>
   );
