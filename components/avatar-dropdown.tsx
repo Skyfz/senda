@@ -4,8 +4,8 @@ import { Avatar } from "@nextui-org/avatar";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/dropdown";
 import { useUser } from '@/context/user-context';
 import SignOut from "@/components/sign-out";
-import { Link } from "@nextui-org/link";
-import { auth } from "@/auth"
+import { IoIosSettings } from "react-icons/io";
+import { RiChat1Line } from "react-icons/ri";
 
 interface AvatarDropdownProps {
   className?: string;
@@ -15,7 +15,7 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
   const { globalUser } = useUser();
 
   return (
-    <Dropdown>
+    <Dropdown backdrop="transparent">
       <DropdownTrigger>
         <Avatar 
           as="button"
@@ -23,7 +23,7 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
           isBordered 
           color="primary" 
           src={globalUser?.image}
-          name={globalUser?.name || "X"}
+          // name={globalUser?.name || "X"}
           data-dropdown-trigger="true"
         />
       </DropdownTrigger>
@@ -42,10 +42,10 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
             </p>
           </div>
         </DropdownItem>
-        <DropdownItem key="settings" href="/settings">
+        <DropdownItem key="settings" href="/settings" startContent={<IoIosSettings/>}>
           Settings
         </DropdownItem>
-        <DropdownItem key="help_and_feedback" href="/help-feedback">
+        <DropdownItem key="help_and_feedback" href="/help-feedback" startContent=<RiChat1Line />>
           Help & Feedback
         </DropdownItem>
         <DropdownItem 
