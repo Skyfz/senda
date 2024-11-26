@@ -33,9 +33,9 @@ export default function RecentContacts() {
   return (
     <Card className="bg-opacity-50">
       <CardBody className="py-5 px-4">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 px-2">
           <div>
-            <h2 className="text-lg font-semibold">Quick Send</h2>
+            <h2 className="text-lg font-semibold pb-1">Quick Send</h2>
             <p className="text-sm text-default-500">Recent contacts</p>
           </div>
           <div className="flex gap-2">
@@ -55,7 +55,7 @@ export default function RecentContacts() {
             </Button>
           </div>
         </div>
-        <Divider className='mb-4'/>
+        <Divider className='my-2'/>
         
         <div className="relative">
           <Button

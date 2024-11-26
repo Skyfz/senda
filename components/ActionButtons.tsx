@@ -11,7 +11,7 @@ export default function ActionButtons() {
   ];
 
   return (
-    <Card shadow="lg" isBlurred className="w-full bg-transparent">
+    <Card shadow="lg" className="w-full bg-transparent backdrop-blur-4xl">
       <CardBody className="p-6">
         <div className="grid grid-cols-4 gap-4">
           {actions.map((action, index) => (

@@ -32,10 +32,10 @@ export default function TransactionsList() {
 
   return (
     <Card className="bg-opacity-50">
-      <CardBody className="py-5 px-6">
-        <div className="flex justify-between items-center mb-8">
+      <CardBody className="py-5 px-4">
+        <div className="flex justify-between items-center mb-4 px-2">
           <div>
-            <h2 className="text-lg font-semibold">Recent&nbsp;Activity</h2>
+            <h2 className="text-lg font-semibold pb-1">Recent&nbsp;Activity</h2>
             <p className="text-sm text-default-500">Today&apos;s&nbsp;transactions</p>
           </div>
           <div className="flex gap-2">
@@ -55,6 +55,7 @@ export default function TransactionsList() {
             </Button>
           </div>
         </div>
+        <Divider className='my-2'/>
         
         <div className="space-y-6">
           {transactions.map((tx, index) => (
