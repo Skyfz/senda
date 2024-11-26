@@ -19,7 +19,7 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
       <DropdownTrigger>
         <Avatar 
           as="button"
-          className={`${className} transition-transform`}
+          className={`${className} transition-transform hover:scale-105`}
           isBordered 
           color="primary" 
           src={globalUser?.image || ""}
