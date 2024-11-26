@@ -35,18 +35,23 @@ export async function GET(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  let body;
   try {
     const url = new URL(request.url);
     const userId = url.searchParams.get('userId');
-    const body = await request.json();
-    const { balance: depositAmount } = body;
+    body = await request.json();
+    const { amount, type } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    if (typeof depositAmount !== 'number' || depositAmount <= 0) {
-      return NextResponse.json({ error: 'Deposit amount must be a positive number' }, { status: 400 });
+    if (typeof amount !== 'number' || amount <= 0) {
+      return NextResponse.json({ error: 'Amount must be a positive number' }, { status: 400 });
+    }
+
+    if (!type || !['deposit', 'withdrawal'].includes(type)) {
+      return NextResponse.json({ error: 'Transaction type must be either "deposit" or "withdrawal"' }, { status: 400 });
     }
 
     const client = await clientPromise;
@@ -56,8 +61,19 @@ export async function PUT(request: Request) {
     const currentWallet = await db.collection("wallets").findOne({ userId });
     const currentBalance = currentWallet?.balance || 0;
 
-    // Add the deposit amount to the current balance
-    const newBalance = currentBalance + depositAmount;
+    // Calculate new balance based on transaction type
+    const newBalance = type === 'deposit' 
+      ? currentBalance + amount 
+      : currentBalance - amount;
+
+    // Check if withdrawal would result in negative balance
+    if (type === 'withdrawal' && newBalance < 0) {
+      return NextResponse.json({ 
+        error: 'Insufficient funds',
+        currentBalance,
+        requestedAmount: amount
+      }, { status: 400 });
+    }
 
     const result = await db.collection("wallets").updateOne(
       { userId },
@@ -73,13 +89,18 @@ export async function PUT(request: Request) {
     return NextResponse.json({ 
       success: true, 
       previousBalance: currentBalance,
-      depositAmount,
+      transactionType: type,
+      amount,
       newBalance,
-      message: result.upsertedId ? 'Wallet created' : 'Deposit successful'
+      message: result.upsertedId 
+        ? 'Wallet created' 
+        : `${type === 'deposit' ? 'Deposit' : 'Withdrawal'} successful`
     });
 
   } catch (error) {
     console.error('Failed to update wallet balance:', error);
-    return NextResponse.json({ error: 'Failed to process deposit' }, { status: 500 });
+    return NextResponse.json({ 
+      error: `Failed to process ${body?.type || 'transaction'}` 
+    }, { status: 500 });
   }
 }

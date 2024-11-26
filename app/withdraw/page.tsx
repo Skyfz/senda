@@ -4,16 +4,15 @@ import { useState } from 'react'
 import { useUser } from "@/context/user-context"
 import { Card, CardBody, Input, Button } from "@nextui-org/react"
 import { useRouter } from 'next/navigation'
-import { ArrowUpRight, Wallet, DollarSign } from 'lucide-react'
+import { ArrowDownLeft, Wallet, DollarSign } from 'lucide-react'
 
-
-export default function DepositPage() {
+export default function WithdrawPage() {
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const { globalUser } = useUser()
   const router = useRouter()
 
-  const handleDeposit = async () => {
+  const handleWithdraw = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       return
     }
@@ -27,7 +26,7 @@ export default function DepositPage() {
         },
         body: JSON.stringify({
           amount: Number(amount),
-          type: 'deposit'
+          type: 'withdrawal'
         })
       })
 
@@ -40,7 +39,7 @@ export default function DepositPage() {
       setAmount('')
       router.push('/')
     } catch (error) {
-      console.error('Deposit failed:', error)
+      console.error('Withdrawal failed:', error)
     } finally {
       setLoading(false)
     }
@@ -50,16 +49,15 @@ export default function DepositPage() {
     <section className="flex flex-col w-full items-center justify-center">
       <div className="min-h-screen w-full max-w-2xl">
         <div className="pt-2 pb-4">
-          
           <Card className="mt-6 bg-opacity-50">
             <CardBody className="py-5 px-4">
               <div className="flex justify-between items-center mb-4 px-2">
                 <div>
-                  <h2 className="text-lg font-semibold pb-1">Deposit Funds</h2>
-                  <p className="text-sm text-default-500">Add money to your wallet</p>
+                  <h2 className="text-lg font-semibold pb-1">Withdraw Funds</h2>
+                  <p className="text-sm text-default-500">Withdraw money from your wallet</p>
                 </div>
-                <div className="p-3 bg-success/10 rounded-full">
-                  <ArrowUpRight className="w-6 h-6 text-success" />
+                <div className="p-3 bg-danger/10 rounded-full">
+                  <ArrowDownLeft className="w-6 h-6 text-danger" />
                 </div>
               </div>
 
@@ -67,7 +65,7 @@ export default function DepositPage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 px-2">
                     <Wallet className="w-5 h-5 text-default-500" />
-                    <span className="text-sm font-medium">Amount to Deposit</span>
+                    <span className="text-sm font-medium">Amount to Withdraw</span>
                   </div>
                   <Input
                     type="number"
@@ -85,12 +83,12 @@ export default function DepositPage() {
 
                 <Button 
                   className="w-full"
-                  color='success'
-                  onClick={handleDeposit}
+                  color="danger"
+                  onClick={handleWithdraw}
                   isDisabled={loading || !amount}
                   isLoading={loading}
                 >
-                  {loading ? "Processing..." : "Confirm Deposit"}
+                  {loading ? "Processing..." : "Confirm Withdrawal"}
                 </Button>
               </div>
             </CardBody>
