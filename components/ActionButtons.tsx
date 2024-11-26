@@ -30,15 +30,16 @@ export default function ActionButtons() {
   ];
 
   return (
-    <Card shadow="lg" className='bg-transparent backdrop-filter backdrop-blur-2xl bg-opacity-20'>
+    <Card shadow="lg" className='bg-transparent backdrop-blur-md'>
       <CardBody>
         <div className="grid grid-cols-4 gap-4">
           {actions.map((action, index) => (
             <Button
               key={index}
               onClick={action.onClick}
-              className="flex flex-col items-center gap-2 min-h-[100px] "
-              variant="light"
+              className="flex flex-col items-center gap-2 min-h-[100px] border-none"
+              variant="ghost"
+              color="default"
             >
               <div className="">
                 {action.icon}
