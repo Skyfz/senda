@@ -21,7 +21,7 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
           as="button"
           className={`${className} transition-transform hover:scale-105`}
           isBordered 
-          color="primary" 
+          color={globalUser ? "primary" : "default"}
           src={globalUser?.image || ""}
           data-dropdown-trigger="true"
         />
@@ -31,25 +31,25 @@ export default function AvatarDropdown({ className = "w-6 h-6 text-tiny" }: Avat
         className="w-[240px]"
         closeOnSelect={false}
       >
-        <DropdownItem key="profile" className="h-18 gap-2 pb-4" href="/account">
+        <DropdownItem key="profile" className="h-18 gap-2 pb-4 pt-2" href="/account">
           <div className="flex flex-col gap-1 cursor-pointer">
-            <p className="font-medium text-default-600 text-small">
+            <p className="font-medium text-default-600 text-lg">
               {globalUser?.name || "No User"}
             </p>
-            <p className="text-default-500 text-tiny">
+            <p className="text-default-500 text-sm">
               {globalUser?.email || "Sign in to access your account"}
             </p>
           </div>
         </DropdownItem>
-        <DropdownItem key="settings" href="/settings" startContent={<IoIosSettings/>}>
-          Settings
+        <DropdownItem key="settings" href="/settings" className="text-lg" startContent={<IoIosSettings/>}>
+          <p className="text-md">Settings</p>
         </DropdownItem>
-        <DropdownItem key="help_and_feedback" href="/help-feedback" startContent=<RiChat1Line />>
-          Help & Feedback
+        <DropdownItem key="help_and_feedback" href="/help-feedback" className="text-lg" startContent=<RiChat1Line />>
+          <p className="text-md">Help & Feedback</p>
         </DropdownItem>
         <DropdownItem 
           key="logout"
-          className="text-danger hover:!bg-danger-50"
+          className="text-danger hover:!bg-danger-50 pt-4"
         >
           <SignOut closeDropdown />
         </DropdownItem>
