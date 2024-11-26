@@ -10,21 +10,23 @@ export default function SignIn() {
   const [isGithubLoading, setIsGithubLoading] = useState(false)
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-6 py-8 md:py-10">
+    <div className="w-full flex flex-col gap-4 py-8 md:py-10">
       <form
         action={googleSignIn}
         onSubmit={() => setIsGoogleLoading(true)}
         onReset={() => setIsGoogleLoading(false)}
       >
         <Button 
-          startContent={!isGoogleLoading && <FaGoogle />} 
+          startContent={!isGoogleLoading && <FaGoogle className="text-lg" />} 
           color="primary" 
           type="submit"
           size="lg"
+          className="w-full font-medium"
           isLoading={isGoogleLoading}
           disabled={isGoogleLoading || isGithubLoading}
+          variant="shadow"
         >
-          Sign in with Google
+          <span className="hidden sm:inline">Continue with </span>Google
         </Button>
       </form>
 
@@ -34,14 +36,16 @@ export default function SignIn() {
         onReset={() => setIsGithubLoading(false)}
       >
         <Button 
-          startContent={!isGithubLoading && <FaGithub />} 
+          startContent={!isGithubLoading && <FaGithub className="text-lg" />} 
           color="default" 
           type="submit"
           size="lg"
+          className="w-full font-medium"
           isLoading={isGithubLoading}
           disabled={isGoogleLoading || isGithubLoading}
+          variant="bordered"
         >
-          Sign in with GitHub
+          <span className="hidden sm:inline">Continue with </span>GitHub
         </Button>
       </form>
     </div>
