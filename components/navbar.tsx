@@ -103,7 +103,7 @@ export const Navbar = () => {
         <NavbarMenuToggle className="md:block lg:hidden"/>
       </NavbarContent>
 
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
+      <NavbarContent className="sm:hidden basis-1 pl-4 gap-5" justify="end">
         <ThemeSwitch />
         <AvatarDropdown/>
         <NavbarMenuToggle />
