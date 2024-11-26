@@ -6,7 +6,7 @@ import AvatarDropdown from './avatar-dropdown';
 export default function Header() {
   const { globalUser } = useUser();
   return (
-    <div className="flex items-center justify-between pb-4 pt-2 px-2">
+    <div className="flex items-center justify-between pb-6 pt-4 px-2">
       <div className="space-y-1">
         <h1 className="text-2xl font-bold">Hi,&nbsp;{globalUser?.name}</h1>
         <h2 className="text-foreground/80 text-sm font-medium">Welcome&nbsp;back</h2>

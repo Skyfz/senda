@@ -4,10 +4,10 @@ import { Send, Wallet, Download, Upload } from 'lucide-react';
 
 export default function ActionButtons() {
   const actions = [
-    { icon: <Send size={24} />, label: "Send", color: "bg-gradient-to-bl from-teal-500 via-sky-600 to-sky-500 text-white" },
-    { icon: <Wallet size={24} />, label: "Receive", color: "bg-gradient-to-bl from-teal-500 via-sky-600 to-sky-600 text-white" },
-    { icon: <Download size={24} />, label: "Deposit", color: "bg-gradient-to-bl from-teal-500 via-sky-600 to-sky-500 text-white" },
-    { icon: <Upload size={24} />, label: "Withdraw", color: "bg-gradient-to-bl from-teal-500 via-sky-600 to-sky-500 text-white" },
+    { icon: <Send size={24} />, label: "Send", color: "bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 text-white" },
+    { icon: <Wallet size={24} />, label: "Receive", color: "bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 text-white" },
+    { icon: <Download size={24} />, label: "Deposit", color: "bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 text-white" },
+    { icon: <Upload size={24} />, label: "Withdraw", color: "bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 text-white" },
   ];
 
   return (

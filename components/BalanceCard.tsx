@@ -7,7 +7,7 @@ export default function BalanceCard() {
   const [showBalance, setShowBalance] = React.useState(true);
   
   return (
-    <Card shadow="lg" className="bg-gradient-to-bl from-sky-300 via-sky-600 to-sky-300 dark:from-black dark:via-sky-600 dark:to-black overflow-hidden relative max-w-2xl mx-auto">
+    <Card shadow="lg" className="bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 overflow-hidden relative max-w-2xl mx-auto">
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1642427749670-f20e2e76ed8c')] opacity-10 mix-blend-overlay" />
       
       <CardBody className="py-8 px-6 relative">
@@ -16,8 +16,8 @@ export default function BalanceCard() {
             <div className="space-y-1">
               <p className="text-white/90 text-sm">Available Balance</p>
               <div className="flex items-center gap-2">
-                <TrendingUp size={14} />
-                <p className="text-xs text-white/80">
+                <TrendingUp size={14} className="text-green-200/70"/>
+                <p className="text-xs text-green-200/70">
                 {showBalance ? "Earning 2.5% APY" : "--- -- ---"}
                 </p>
               </div>
