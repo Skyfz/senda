@@ -7,7 +7,6 @@ interface User {
   // Add other user properties here
 }
 
-// Changed to named export for GET
 export async function GET(request: Request) {
   try {
     const client: MongoClient = await clientPromise;
@@ -26,6 +25,7 @@ export async function GET(request: Request) {
     
     return NextResponse.json(users);
   } catch (error) {
+    console.error('Error in GET /api/users:', error);
     return NextResponse.json(
       { error: 'Failed to fetch users' },
       { status: 500 }
@@ -33,7 +33,6 @@ export async function GET(request: Request) {
   }
 }
 
-// Changed to named export for POST
 export async function POST(request: Request) {
   try {
     const client: MongoClient = await clientPromise;
@@ -50,12 +49,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Return the newly created user document
-    const newUser = await users.findOne({ _id: result.insertedId });
-    return NextResponse.json(newUser);
+    return NextResponse.json({ 
+      message: 'User created successfully',
+      id: result.insertedId 
+    });
   } catch (error) {
+    console.error('Error in POST /api/users:', error);
     return NextResponse.json(
-      { error: 'Failed to insert document' },
+      { error: 'Failed to create user' },
       { status: 500 }
     );
   }

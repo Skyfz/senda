@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import { useUser } from "@/context/user-context"
 import { Card, CardBody, Input, Button } from "@nextui-org/react"
+import { useRouter } from 'next/navigation'
 
 export default function DepositPage() {
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const { globalUser } = useUser()
+  const router = useRouter()
 
   const handleDeposit = async () => {
     if (!amount || isNaN(Number(amount))) {
@@ -39,6 +41,8 @@ export default function DepositPage() {
      
     } finally {
       setLoading(false)
+      //show pop or somethingn then home
+      router.push('/')
     }
   }
 
