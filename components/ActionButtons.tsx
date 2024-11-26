@@ -1,29 +1,50 @@
 import React from 'react';
-import { Card, CardBody } from "@nextui-org/react";
+import { Card, CardBody, Button } from "@nextui-org/react";
 import { Send, Wallet, Download, Upload } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
 export default function ActionButtons() {
+  const router = useRouter();
+  
   const actions = [
-    { icon: <Send size={24} />, label: "Send", color: "bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 text-white" },
-    { icon: <Wallet size={24} />, label: "Receive", color: "bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 text-white" },
-    { icon: <Download size={24} />, label: "Deposit", color: "bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 text-white" },
-    { icon: <Upload size={24} />, label: "Withdraw", color: "bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 text-white" },
+    { 
+      icon: <Send size={24} />, 
+      label: "Send", 
+      onClick: () => router.push('/send')
+    },
+    { 
+      icon: <Wallet size={24} />, 
+      label: "Receive", 
+      onClick: () => router.push('/receive')  
+    },
+    { 
+      icon: <Download size={24} />, 
+      label: "Deposit", 
+      onClick: () => router.push('/deposit')
+    },
+    { 
+      icon: <Upload size={24} />, 
+      label: "Withdraw", 
+      onClick: () => router.push('/withdraw')
+    },
   ];
 
   return (
-    <Card shadow="lg" className="w-full bg-transparent backdrop-blur-4xl">
-      <CardBody className="p-6">
+    <Card shadow="lg" className='bg-transparent backdrop-filter backdrop-blur-2xl bg-opacity-20'>
+      <CardBody>
         <div className="grid grid-cols-4 gap-4">
           {actions.map((action, index) => (
-            <button
+            <Button
               key={index}
-              className="flex flex-col items-center gap-2 group transition-transform hover:scale-105"
+              onClick={action.onClick}
+              className="flex flex-col items-center gap-2 min-h-[100px] "
+              variant="light"
             >
-              <div className={`p-3 rounded-xl ${action.color} group-hover:opacity-90 transition-all`}>
+              <div className="">
                 {action.icon}
               </div>
-              <span className="text-xs font-medium">{action.label}</span>
-            </button>
+              <span className="text-xs font-medium ">{action.label}</span>
+            </Button>
           ))}
         </div>
       </CardBody>
