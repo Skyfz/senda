@@ -12,10 +12,13 @@ export default function BalanceCard() {
   const [showBalance, setShowBalance] = React.useState(true);
   const { globalUser } = useUser();
   
-  // Fetch earnings rate with auto-refresh every 5 seconds
+  // Fetch earnings rate only once
   const { data: earningsData } = useSWR('/api/admin/earnings', fetcher, {
-    refreshInterval: 5000,
-    fallbackData: { rate: 3 }
+    revalidateOnMount: true,
+    refreshInterval: 0,  // Disable auto-refresh
+    revalidateOnFocus: true,  // Don't revalidate on tab focus
+    revalidateOnReconnect: true,  // Don't revalidate on reconnect
+    fallbackData: { rate: 12.5 }
   });
 
   // Fetch wallet balance with auto-refresh
@@ -24,12 +27,23 @@ export default function BalanceCard() {
     fetcher,
     {
       refreshInterval: 5000,
+      revalidateOnFocus: true,  // Don't revalidate on tab focus
+      revalidateOnReconnect: true,  // Don't revalidate on reconnect
+      revalidateOnMount: true,
       fallbackData: { balance: 0 }
     }
   );
 
   const earningsRate = earningsData?.rate ? Number(earningsData.rate.toFixed(2)) : 0;
-  const balance = walletData?.balance ? Number(walletData.balance.toFixed(2)) : 0;
+  const balance = walletData?.balance ? Number(walletData.balance) : 0;
+
+  // Format balance with commas and 2 decimal places
+  const formattedBalance = new Intl.NumberFormat('en-ZA', {
+    style: 'currency',
+    currency: 'ZAR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(balance);
 
   return (
     <Card shadow="lg" className="bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 overflow-hidden relative max-w-2xl mx-auto">
@@ -58,7 +72,7 @@ export default function BalanceCard() {
           </div>
           
           <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
-            {showBalance ? "R 1,234.56" : "--- -- ---"}
+            {showBalance ? formattedBalance : "--- -- ---"}
           </h1>
           
           <div className="flex items-center gap-3">
