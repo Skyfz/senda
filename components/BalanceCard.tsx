@@ -2,10 +2,35 @@ import React from 'react';
 import { Card, CardBody, Button } from "@nextui-org/react";
 import { Eye, EyeOff, ChevronRight, Sparkles } from 'lucide-react';
 import { TrendingUp } from 'lucide-react';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
+
+import { useUser } from "@/context/user-context";
 
 export default function BalanceCard() {
   const [showBalance, setShowBalance] = React.useState(true);
+  const { globalUser } = useUser();
   
+  // Fetch earnings rate with auto-refresh every 5 seconds
+  const { data: earningsData } = useSWR('/api/admin/earnings', fetcher, {
+    refreshInterval: 5000,
+    fallbackData: { rate: 3 }
+  });
+
+  // Fetch wallet balance with auto-refresh
+  const { data: walletData } = useSWR(
+    globalUser?._id ? `/api/wallet/balance?userId=${globalUser._id}` : null,
+    fetcher,
+    {
+      refreshInterval: 5000,
+      fallbackData: { balance: 0 }
+    }
+  );
+
+  const earningsRate = earningsData?.rate ? Number(earningsData.rate.toFixed(2)) : 0;
+  const balance = walletData?.balance ? Number(walletData.balance.toFixed(2)) : 0;
+
   return (
     <Card shadow="lg" className="bg-gradient-to-bl from-sky-400 via-sky-600 to-sky-500 overflow-hidden relative max-w-2xl mx-auto">
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1642427749670-f20e2e76ed8c')] opacity-10 mix-blend-overlay" />
@@ -18,7 +43,7 @@ export default function BalanceCard() {
               <div className="flex items-center gap-2">
                 <TrendingUp size={14} className="text-green-200/70"/>
                 <p className="text-xs text-green-200/70">
-                {showBalance ? "Earning 2.5% APY" : "--- -- ---"}
+                {showBalance ? `Earning ${earningsRate}% APY` : "--- -- ---"}
                 </p>
               </div>
             </div>
