@@ -3,9 +3,13 @@ import { Bell } from 'lucide-react';
 import { useUser } from '@/context/user-context';
 import AvatarDropdown from './avatar-dropdown';
 import { Skeleton } from "@nextui-org/react";
+import { Button } from "@nextui-org/button";
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
   const { globalUser } = useUser();
+  const router = useRouter();
+  const demoAction = { onClick: () => router.push('/demo')};
 
   if (!globalUser) {
     return (
@@ -35,9 +39,9 @@ export default function Header() {
       </div>
       <div className="flex items-center gap-6">
         {/* <AvatarDropdown className=""/> */}
-        <button className="p-2 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-md hover:bg-white/20 dark:hover:bg-white/20 transition-all">
-          <Bell size={30} />
-        </button>
+        <Button onClick={demoAction.onClick} variant='flat' color='default' isIconOnly={true} radius='full'>
+          <Bell size={24} />
+        </Button>
       </div>
     </div>
   );

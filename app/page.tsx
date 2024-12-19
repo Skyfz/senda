@@ -8,19 +8,6 @@ import TransactionsList from '@/components/TransactionsList';
 
 export default function Home() {
 
-  const recentContacts = [
-    { name: "Sarah M.", img: "https://i.pravatar.cc/150?u=a042581f4e29026024d" },
-    { name: "John D.", img: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
-    { name: "Alex W.", img: "https://i.pravatar.cc/150?u=a04258114e29026702d" },
-    { name: "Emma S.", img: "https://i.pravatar.cc/150?u=a048581f4e29026701d" },
-  ];
-
-  const transactions = [
-    { type: "Sent", amount: "-$50.00", to: "Sarah M.", date: "Today" },
-    { type: "Received", amount: "+$120.00", from: "John D.", date: "Yesterday" },
-    { type: "Sent", amount: "-$25.00", to: "Alex W.", date: "Yesterday" },
-  ];
-
   return (
     <section className="flex flex-col w-full items-center justify-center">
 
