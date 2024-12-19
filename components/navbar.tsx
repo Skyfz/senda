@@ -59,7 +59,7 @@ export const Navbar = () => {
     <NextUINavbar 
       maxWidth="xl"
       position="sticky"
-      //isBordered
+      //isBordered 
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
       shouldHideOnScroll={true}
@@ -103,7 +103,7 @@ export const Navbar = () => {
         <NavbarMenuToggle className="md:block lg:hidden"/>
       </NavbarContent>
 
-      <NavbarContent className="sm:hidden basis-1 pl-4 gap-5" justify="end">
+      <NavbarContent className="position-fixed bottom-0 sm:hidden basis-1 pl-4 gap-5" justify="end">
         <ThemeSwitch />
         <AvatarDropdown/>
         <NavbarMenuToggle />
