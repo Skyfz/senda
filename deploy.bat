@@ -1,4 +1,5 @@
 @echo off
+
 echo Starting deployment...
 
 git add .
