@@ -445,7 +445,7 @@ export default function DepositPage() {
                               </>
                             ) : (
                               <div className="mt-4 p-4 bg-default-100 rounded-lg text-default-500 text-center">
-                                Enter an amount and click "Generate Link" to create a payment link
+                                Enter an amount and click &quot;Generate Link&quot; to create a payment link
                               </div>
                             )}
                           </div>
