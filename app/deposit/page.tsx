@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { useUser } from "@/context/user-context"
 import { Card, CardBody, Input, Button } from "@nextui-org/react"
-import { ArrowUpRight, Wallet, DollarSign, Share } from 'lucide-react'
+import { ArrowUpRight, Wallet, DollarSign, Share, Copy } from 'lucide-react'
 import { Switch, cn } from '@nextui-org/react'
 import React from 'react'
 
 export default function DepositPage() {
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
-  const [isSelected, setIsSelected] = React.useState(true);
+  const [isTest, setIsTest] = React.useState(true);
   const [isSelectedLink, setIsSelectedLink] = React.useState(true);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const { globalUser } = useUser()
@@ -43,7 +43,7 @@ export default function DepositPage() {
             amount: amount,
             transactionReference: globalUser?._id,
             bankReference: 'BANK_REF_123',
-            isTest: isSelected,
+            isTest: isTest,
             generateUrl: true // This flag tells the API to generate a URL instead of redirecting
           }),
         });
@@ -91,7 +91,7 @@ export default function DepositPage() {
           amount: amount,
           transactionReference: globalUser?._id,
           bankReference: 'BANK_REF_123',
-          isTest: isSelected,
+          isTest: isTest,
         }),
       });
 
@@ -168,8 +168,8 @@ export default function DepositPage() {
                 </div>
 
                 <Switch
-                  isSelected={isSelected}
-                  onValueChange={setIsSelected}
+                  isSelected={isTest}
+                  onValueChange={setIsTest}
                   color='success'
                   classNames={{
                     base: cn(
@@ -180,9 +180,9 @@ export default function DepositPage() {
                   }}
                 >
                   <div className="flex flex-col gap-1">
-                    <p className="text-medium">Test Transaction</p>
+                    <p className="text-medium font-semibold">Test Transaction</p>
                     <p className="text-tiny text-default-400">
-                      This toggle makes the transaction a test.
+                      This toggle makes the transaction a test
                     </p>
                   </div>
                 </Switch>
@@ -190,26 +190,26 @@ export default function DepositPage() {
                 <Switch
                   isSelected={isSelectedLink}
                   onValueChange={setIsSelectedLink}
-                  color='primary'
+                  color='success'
                   classNames={{
                     base: cn(
                       "inline-flex flex-row-reverse min-w-full bg-content1 hover:bg-content2 items-center",
                       "justify-between rounded-lg gap-2 p-4 border-1 border-transparent",
-                      "data-[selected=true]:border-primary",
                     ),
                   }}
                 >
                   <div className="flex flex-col gap-1">
                     <p className="text-medium">Payment Link</p>
                     <p className="text-tiny text-default-400">
-                      This toggle generates a payment link.
+                      This toggle generates a payment link
                     </p>
                   </div>
                 </Switch>
 
                 <Button 
                   className="w-full"
-                  color='success'
+                  color="success"
+                  size="lg"
                   onClick={initiateDeposit}
                   isDisabled={loading || !amount}
                   isLoading={loading}
@@ -218,36 +218,56 @@ export default function DepositPage() {
                 </Button>
                 
                 {paymentUrl && (
-                  <div className="mt-4 flex gap-2 items-center">
-                    <Button
-                      className="w-full"
-                      color="primary"
-                      variant="bordered"
-                      startContent={<Share className="h-4 w-4" />}
-                      onClick={async () => {
-                        if (typeof navigator.share === 'function') {
-                          try {
-                            await navigator.share({
-                              title: 'Payment Link',
-                              text: 'Here is your payment link',
-                              url: paymentUrl
-                            });
-                          } catch (err) {
-                            console.log('Error sharing:', err);
-                          }
-                        } else {
-                          // Fallback to clipboard
+                  <div className="mt-4 flex flex-col gap-2">
+                      <Button
+                        className="w-full"
+                        onClick={() => window.open(paymentUrl, '_blank')}
+                      >
+                        <span className="text-small text-default-600 break-all normal-case">{paymentUrl}</span>
+                      </Button>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        className="flex-1"
+                        color="success"
+                        variant="flat"
+                        startContent={<Copy className="h-4 w-4" />}
+                        onClick={async () => {
                           try {
                             await navigator.clipboard.writeText(paymentUrl);
-                            alert('Payment link copied to clipboard!');
+                            alert("Payment link copied to clipboard!");
                           } catch (err) {
                             console.log('Error copying to clipboard:', err);
+                            alert("Failed to copy link");
                           }
-                        }
-                      }}
-                    >
-                      {typeof navigator.share === 'function' ? 'Share Payment Link' : 'Copy Payment Link'}
-                    </Button>
+                        }}
+                      >
+                        Copy
+                      </Button>
+
+                      <Button
+                        className="flex-1"
+                        color="success"
+                        variant="flat"
+                        startContent={<Share className="h-4 w-4" />}
+                        onClick={async () => {
+                          if (typeof navigator.share === 'function') {
+                            try {
+                              await navigator.share({
+                                title: 'Payment Link',
+                                text: 'Here is your payment link',
+                                url: paymentUrl,
+                              });
+                            } catch (err) {
+                              console.log('Error sharing:', err);
+                              alert("Failed to share link");
+                            }
+                          }
+                        }}
+                      >
+                        Share
+                      </Button>
+                    </div>
                   </div>
                 )}
                 
