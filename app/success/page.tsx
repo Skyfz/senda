@@ -37,6 +37,9 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
     const verifyTransaction = async () => {
       if (!searchParams.TransactionReference || !searchParams.Status) {
         setError('Invalid transaction parameters');
+        console.log('Invalid transaction parameters');
+        console.log(searchParams.TransactionReference);
+        console.log(searchParams.Status);
         return;
       }
 
