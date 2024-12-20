@@ -32,33 +32,27 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const [params, setParams] = useState(searchParams);
-
-  useEffect(() => {
-    // Ensure we have the search params
-    if (!params || Object.keys(params).length === 0) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const newParams = {
-        TransactionReference: urlParams.get('TransactionReference') || '',
-        Status: urlParams.get('Status') || '',
-        TransactionId: urlParams.get('TransactionId') || '',
-        Amount: urlParams.get('Amount') || '',
-        StatusMessage: urlParams.get('StatusMessage') || '',
-        IsTest: urlParams.get('IsTest') || '',
-        Hash: urlParams.get('Hash') || '',
-      };
-      setParams(newParams);
-    }
-  }, [params]);
+  const [params, setParams] = useState<SuccessPageProps['searchParams']>(
+    Object.keys(searchParams).length > 0 
+      ? searchParams 
+      : (() => {
+          const urlParams = new URLSearchParams(window.location.search);
+          return {
+            TransactionReference: urlParams.get('TransactionReference') || '',
+            Status: urlParams.get('Status') || '',
+            TransactionId: urlParams.get('TransactionId') || '',
+            Amount: urlParams.get('Amount') || '',
+            StatusMessage: urlParams.get('StatusMessage') || '',
+            IsTest: urlParams.get('IsTest') || '',
+            Hash: urlParams.get('Hash') || ''
+          };
+        })()
+  );
 
   useEffect(() => {
     const verifyTransaction = async () => {
-      console.log('Current params:', params);
-      
       if (!params.TransactionReference || !params.Status) {
         setError('Invalid transaction parameters');
-        console.log('TransactionReference:', params.TransactionReference);
-        console.log('Status:', params.Status);
         return;
       }
 
