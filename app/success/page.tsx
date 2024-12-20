@@ -2,8 +2,9 @@
 
 import { Button } from "@nextui-org/button";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/context/user-context";
+import { Card } from "@nextui-org/card";
 
 interface SuccessPageProps {
   searchParams: {
@@ -25,57 +26,89 @@ interface SuccessPageProps {
 }
 
 export default function SuccessPage({ searchParams }: SuccessPageProps) {
-  const { globalUser } = useUser(); // Only need to read the user data
+  const { globalUser } = useUser();
   const [loading, setLoading] = useState(false);
-  const [amount, setAmount] = useState('')
-  const router = useRouter()
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
-  const params = Object.entries(searchParams).map(([key, value]) => (
-    <div key={key} className="mb-2">
-      {key}: {value || "N/A"}
-    </div>
-  ));
-
-  const handleDeposit = async () => {
-    
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/wallet/balance?userId=${globalUser?._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: Number(amount),
-          type: 'deposit'
-        })
-      })
-
-      const data = await response.json()
-
-      if (data.error) {
-        throw new Error(data.error)
+  useEffect(() => {
+    const verifyTransaction = async () => {
+      if (!searchParams.TransactionReference || !searchParams.Status) {
+        setError('Invalid transaction parameters');
+        return;
       }
 
-      setAmount('')
-      router.push('/')
-    } catch (error) {
-      console.error('Deposit failed:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+      setLoading(true);
+      try {
+        const response = await fetch('/api/transactions/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            transactionReference: searchParams.TransactionReference,
+            ozowTransactionId: searchParams.TransactionId,
+            amount: searchParams.Amount,
+            status: searchParams.Status,
+            statusMessage: searchParams.StatusMessage,
+            isTest: searchParams.IsTest,
+            hash: searchParams.Hash
+          }),
+        });
 
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to verify transaction');
+        }
+
+        const result = await response.json();
+        if (result.success) {
+          setSuccess(true);
+          // Redirect to wallet after 3 seconds
+          setTimeout(() => {
+            // router.push('/wallet');
+          }, 3000);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to verify transaction');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifyTransaction();
+  }, [searchParams, router]);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4 text-green-600">Transaction Successful</h1>
-      <div className="p-4 rounded-lg">
-        {params}
-      </div>
-      <Button className="mt-4" href="/" as="a">
-        Return Home
-      </Button>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <Card className="w-full max-w-md p-6 space-y-4">
+        {loading ? (
+          <div className="text-center">
+            <div className="mb-4">Verifying your payment...</div>
+            {/* Add a loading spinner here if you want */}
+          </div>
+        ) : error ? (
+          <div className="text-center">
+            <div className="text-danger mb-4">{error}</div>
+            <Button 
+              color="primary"
+              onClick={() => router.push('/deposit')}
+            >
+              Try Again
+            </Button>
+          </div>
+        ) : success ? (
+          <div className="text-center">
+            <div className="text-success mb-4">
+              Payment successful! Amount: R{searchParams.Amount}
+            </div>
+            <div className="text-small text-default-500">
+              Redirecting to wallet...
+            </div>
+          </div>
+        ) : null}
+      </Card>
     </div>
   );
 }

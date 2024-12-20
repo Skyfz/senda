@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useUser } from "@/context/user-context"
 import { Card, CardBody, Input, Button,Tabs, Tab, Divider} from "@nextui-org/react"
-import { ArrowUpRight, Wallet, Share, Copy } from 'lucide-react'
+import { ArrowUpRight, Wallet, Share, Copy, Hash } from 'lucide-react'
 import { Switch, cn } from '@nextui-org/react'
 import React from 'react'
 
@@ -36,6 +36,18 @@ export default function DepositPage() {
 
   // Get current calculations
   const calculations = calculateFees(amount);
+
+  // Function to generate bank reference
+  const generateBankReference = () => {
+    const now = new Date();
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const year = now.getFullYear();
+    const isPM = now.getHours() >= 12;
+    const time = now.getHours() % 12 || 12;
+    const ampm = isPM ? 'p' : 'a';
+    return `snda_${day}_${month}_${year}_${time}${ampm}`;
+  };
 
   const initiateDeposit = async () => {
     if (selectedTab === 'link') {
@@ -88,7 +100,7 @@ export default function DepositPage() {
         body: JSON.stringify({
           amount: calculations.total, // Use total amount including fees
           transactionReference: transactionData.transaction_id,
-          bankReference: 'BANK_REF_123',
+          bankReference: generateBankReference(),
           isTest: isTest,
           generateUrl: true
         }),
@@ -162,8 +174,9 @@ export default function DepositPage() {
         body: JSON.stringify({
           amount: calculations.total, // Use total amount including fees
           transactionReference: transactionData.transaction_id,
-          bankReference: 'BANK_REF_123',
+          bankReference: generateBankReference(),
           isTest: isTest,
+          generateUrl: false
         }),
       });
 

@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb'
 export async function POST(req: Request) {
   try {
     const client = await clientPromise
-    const db = client.db("senda")
+    const db = client.db("test")
     const { 
       from_user_id,
       to_user_id,
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const client = await clientPromise
-    const db = client.db("senda")
+    const db = client.db("test")
     
     const { searchParams } = new URL(req.url)
     const user_id = searchParams.get('user_id')

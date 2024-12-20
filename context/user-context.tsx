@@ -28,10 +28,14 @@ interface UserContextType {
   setGlobalUser: (user: User | null) => void;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType>({
+  globalUser: null,
+  setGlobalUser: () => {}
+});
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [globalUser, setGlobalUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -63,6 +67,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error('Error checking user:', error);
         setGlobalUser(null);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -72,7 +78,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return () => {
       setGlobalUser(null);
     };
-  }, [router, pathname]); // Add pathname as a dependency
+  }, [pathname, router]);
+
+  if (loading) {
+    return null; // or a loading spinner
+  }
 
   return (
     <UserContext.Provider value={{ globalUser, setGlobalUser }}>
