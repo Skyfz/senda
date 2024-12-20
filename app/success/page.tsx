@@ -1,4 +1,9 @@
+'use client'
+
 import { Button } from "@nextui-org/button";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useUser } from "@/context/user-context";
 
 interface SuccessPageProps {
   searchParams: {
@@ -20,11 +25,47 @@ interface SuccessPageProps {
 }
 
 export default function SuccessPage({ searchParams }: SuccessPageProps) {
+  const { globalUser } = useUser(); // Only need to read the user data
+  const [loading, setLoading] = useState(false);
+  const [amount, setAmount] = useState('')
+  const router = useRouter()
+
   const params = Object.entries(searchParams).map(([key, value]) => (
     <div key={key} className="mb-2">
       {key}: {value || "N/A"}
     </div>
   ));
+
+  const handleDeposit = async () => {
+    
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/wallet/balance?userId=${globalUser?._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: Number(amount),
+          type: 'deposit'
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      setAmount('')
+      router.push('/')
+    } catch (error) {
+      console.error('Deposit failed:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
 
   return (
     <div className="container mx-auto p-4">
