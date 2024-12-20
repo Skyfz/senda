@@ -55,8 +55,8 @@ export async function POST(req: Request) {
 
     // If transaction is complete, update user's balance
     if (status.toLowerCase() === 'complete') {
-      await db.collection("users").updateOne(
-        { _id: new ObjectId(transaction.to_user_id) },
+      await db.collection("wallets").updateOne(
+        { userId: new ObjectId(transaction.to_user_id) },
         {
           $inc: { balance: transaction.amount } // Only add the transaction amount, not including fee
         }
