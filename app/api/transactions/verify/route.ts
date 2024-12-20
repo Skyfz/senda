@@ -53,14 +53,31 @@ export async function POST(req: Request) {
       }
     )
 
-    // If transaction is complete, update user's balance
+    // If transaction is complete, update wallet balance
     if (status.toLowerCase() === 'complete') {
-      await db.collection("wallets").updateOne(
-        { userId: new ObjectId(transaction.to_user_id) },
-        {
-          $inc: { balance: transaction.amount } // Only add the transaction amount, not including fee
-        }
-      )
+      // Find the wallet first to ensure it exists
+      const wallet = await db.collection("wallets").findOne({
+        userId: transaction.to_user_id
+      });
+
+      if (!wallet) {
+        // Create wallet if it doesn't exist
+        await db.collection("wallets").insertOne({
+          userId: transaction.to_user_id,
+          balance: transaction.amount,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+      } else {
+        // Update existing wallet
+        await db.collection("wallets").updateOne(
+          { userId: transaction.to_user_id },
+          {
+            $inc: { balance: transaction.amount },
+            $set: { updated_at: new Date().toISOString() }
+          }
+        );
+      }
     }
 
     return NextResponse.json({
