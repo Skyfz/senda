@@ -32,20 +32,33 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const [params, setParams] = useState(searchParams);
+
+  useEffect(() => {
+    // Ensure we have the search params
+    if (!params || Object.keys(params).length === 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const newParams = {
+        TransactionReference: urlParams.get('TransactionReference') || '',
+        Status: urlParams.get('Status') || '',
+        TransactionId: urlParams.get('TransactionId') || '',
+        Amount: urlParams.get('Amount') || '',
+        StatusMessage: urlParams.get('StatusMessage') || '',
+        IsTest: urlParams.get('IsTest') || '',
+        Hash: urlParams.get('Hash') || '',
+      };
+      setParams(newParams);
+    }
+  }, [params]);
 
   useEffect(() => {
     const verifyTransaction = async () => {
-      console.log('Full searchParams:', searchParams);
+      console.log('Current params:', params);
       
-      if (!searchParams || typeof searchParams !== 'object') {
-        setError('Search parameters are not available');
-        return;
-      }
-
-      if (!searchParams.TransactionReference || !searchParams.Status) {
+      if (!params.TransactionReference || !params.Status) {
         setError('Invalid transaction parameters');
-        console.log('TransactionReference:', searchParams.TransactionReference);
-        console.log('Status:', searchParams.Status);
+        console.log('TransactionReference:', params.TransactionReference);
+        console.log('Status:', params.Status);
         return;
       }
 
@@ -57,13 +70,13 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            transactionReference: searchParams.TransactionReference,
-            ozowTransactionId: searchParams.TransactionId,
-            amount: searchParams.Amount,
-            status: searchParams.Status,
-            statusMessage: searchParams.StatusMessage,
-            isTest: searchParams.IsTest,
-            hash: searchParams.Hash
+            transactionReference: params.TransactionReference,
+            ozowTransactionId: params.TransactionId,
+            amount: params.Amount,
+            status: params.Status,
+            statusMessage: params.StatusMessage,
+            isTest: params.IsTest,
+            hash: params.Hash
           }),
         });
 
@@ -84,7 +97,7 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
     };
 
     verifyTransaction();
-  }, [searchParams]);
+  }, [params]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -138,17 +151,17 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                     <CardBody className="gap-2">
                       <div className="flex justify-between text-small">
                         <span className="text-default-500">Amount:</span>
-                        <span>R {searchParams.Amount}</span>
+                        <span>R {params.Amount}</span>
                       </div>
                       <div className="flex justify-between text-small">
                         <span className="text-default-500">Transaction ID:</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs">{searchParams.TransactionId}</span>
+                          <span className="text-xs">{params.TransactionId}</span>
                           <Button
                             isIconOnly
                             size="sm"
                             variant="light"
-                            onClick={() => copyToClipboard(searchParams.TransactionId || '')}
+                            onClick={() => copyToClipboard(params.TransactionId || '')}
                           >
                             <Copy className="w-4 h-4" />
                           </Button>
@@ -156,9 +169,9 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                       </div>
                       <div className="flex justify-between text-small">
                         <span className="text-default-500">Status:</span>
-                        <span className="text-success">{searchParams.Status}</span>
+                        <span className="text-success">{params.Status}</span>
                       </div>
-                      {searchParams.IsTest === 'true' && (
+                      {params.IsTest === 'true' && (
                         <div className="text-warning text-tiny mt-2">
                           This was a test transaction
                         </div>
