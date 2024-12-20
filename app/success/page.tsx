@@ -4,7 +4,8 @@ import { Button } from "@nextui-org/button";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/user-context";
-import { Card } from "@nextui-org/card";
+import { Card, CardBody, Divider, Spinner } from "@nextui-org/react";
+import { ArrowUpRight, CheckCircle2, Copy, AlertCircle } from 'lucide-react';
 
 interface SuccessPageProps {
   searchParams: {
@@ -65,10 +66,6 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
         const result = await response.json();
         if (result.success) {
           setSuccess(true);
-          // Redirect to wallet after 3 seconds
-          setTimeout(() => {
-            // router.push('/wallet');
-          }, 3000);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to verify transaction');
@@ -78,37 +75,112 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
     };
 
     verifyTransaction();
-  }, [searchParams, router]);
+  }, [searchParams]);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <Card className="w-full max-w-md p-6 space-y-4">
-        {loading ? (
-          <div className="text-center">
-            <div className="mb-4">Verifying your payment...</div>
-            {/* Add a loading spinner here if you want */}
-          </div>
-        ) : error ? (
-          <div className="text-center">
-            <div className="text-danger mb-4">{error}</div>
-            <Button 
-              color="primary"
-              onClick={() => router.push('/deposit')}
-            >
-              Try Again
-            </Button>
-          </div>
-        ) : success ? (
-          <div className="text-center">
-            <div className="text-success mb-4">
-              Payment successful! Amount: R{searchParams.Amount}
-            </div>
-            <div className="text-small text-default-500">
-              Redirecting to wallet...
-            </div>
-          </div>
-        ) : null}
-      </Card>
-    </div>
+    <section className="flex flex-col w-full items-center justify-center">
+      <div className="min-h-screen w-full max-w-2xl">
+        <Card className="bg-opacity-50">
+          <CardBody className="py-5 px-4">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-8 gap-4">
+                <Spinner size="lg" color="success"/>
+                <div className="text-default-500">Verifying your payment...</div>
+              </div>
+            ) : error ? (
+              <>
+                <div className="flex justify-between items-center mb-4 px-2">
+                  <div>
+                    <h2 className="text-lg font-semibold pb-1">Transaction Failed</h2>
+                    <p className="text-sm text-danger">There was an error processing your payment</p>
+                  </div>
+                  <div className="p-3 bg-danger/10 rounded-full">
+                    <AlertCircle className="w-6 h-6 text-danger" />
+                  </div>
+                </div>
+                <div className="text-center py-8">
+                  <div className="text-danger mb-4">{error}</div>
+                  <Button 
+                    color="primary"
+                    onClick={() => router.push('/deposit')}
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              </>
+            ) : success ? (
+              <>
+                <div className="flex justify-between items-center mb-4 px-2">
+                  <div>
+                    <h2 className="text-lg font-semibold pb-1">Transaction Successful</h2>
+                    <p className="text-sm text-default-500">Your deposit has been processed</p>
+                  </div>
+                  <div className="p-3 bg-success/10 rounded-full">
+                    <CheckCircle2 className="w-6 h-6 text-success" />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Card isBlurred>
+                    <CardBody className="gap-2">
+                      <div className="flex justify-between text-small">
+                        <span className="text-default-500">Amount:</span>
+                        <span>R {searchParams.Amount}</span>
+                      </div>
+                      <div className="flex justify-between text-small">
+                        <span className="text-default-500">Transaction ID:</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs">{searchParams.TransactionId}</span>
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            onClick={() => copyToClipboard(searchParams.TransactionId || '')}
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-small">
+                        <span className="text-default-500">Status:</span>
+                        <span className="text-success">{searchParams.Status}</span>
+                      </div>
+                      {searchParams.IsTest === 'true' && (
+                        <div className="text-warning text-tiny mt-2">
+                          This was a test transaction
+                        </div>
+                      )}
+                      <Divider className="my-2"/>
+                      <div className="text-tiny text-default-400">
+                        Transaction processed by Ozow
+                      </div>
+                    </CardBody>
+                  </Card>
+
+                  <div className="flex justify-center gap-2 pt-4">
+                    <Button 
+                      color="primary"
+                      onClick={() => router.push('/wallet')}
+                    >
+                      View Wallet
+                    </Button>
+                    <Button 
+                      variant="bordered"
+                      onClick={() => router.push('/deposit')}
+                    >
+                      New Deposit
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </CardBody>
+        </Card>
+      </div>
+    </section>
   );
 }
