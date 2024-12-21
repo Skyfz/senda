@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     
     // Get query parameters
     const { searchParams } = new URL(req.url);
-    const siteCode = searchParams.get("siteCode");
+    const siteCode = process.env.OZOW_SITE_CODE;
     const transactionId = searchParams.get("transactionId");
     const isTest = searchParams.get("isTest") === "true";
 
@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
     const url = `${baseUrl}/GetTransaction?siteCode=${siteCode}&transactionId=${transactionId}`;
 
     console.log("Fetching transaction from Ozow API:", url);
+    console.log("API Key:", apiKey);
 
     // Make request to Ozow API
     const response = await fetch(url, {
