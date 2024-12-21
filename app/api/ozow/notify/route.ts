@@ -76,7 +76,30 @@ function validateOzowHash(notification: OzowNotification): boolean {
 
 export async function POST(req: NextRequest) {
   try {
-    const notification: OzowNotification = await req.json();
+    // Parse form data
+    const formData = await req.formData();
+    const notification: OzowNotification = {
+      SiteCode: formData.get('SiteCode') as string,
+      TransactionId: formData.get('TransactionId') as string,
+      TransactionReference: formData.get('TransactionReference') as string,
+      Amount: parseFloat(formData.get('Amount') as string),
+      Status: formData.get('Status') as string,
+      Optional1: formData.get('Optional1') as string || '',
+      Optional2: formData.get('Optional2') as string || '',
+      Optional3: formData.get('Optional3') as string || '',
+      Optional4: formData.get('Optional4') as string || '',
+      Optional5: formData.get('Optional5') as string || '',
+      CurrencyCode: formData.get('CurrencyCode') as string,
+      IsTest: formData.get('IsTest') === 'true',
+      StatusMessage: formData.get('StatusMessage') as string || '',
+      Hash: formData.get('Hash') as string,
+      SubStatus: formData.get('SubStatus') as string || '',
+      MaskedAccountNumber: formData.get('MaskedAccountNumber') as string || '',
+      BankName: formData.get('BankName') as string || '',
+      SmartIndicators: formData.get('SmartIndicators') as string || ''
+    };
+
+    console.log('Received notification:', notification);
 
     // Validate hash
     if (!validateOzowHash(notification)) {
@@ -140,10 +163,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Update transaction
-    await db.collection('transactions').updateOne(
+    const result = await db.collection('transactions').updateOne(
       { _id: new ObjectId(notification.TransactionReference) },
       { $set: updateData }
     );
+
+    console.log('Transaction update result:', result);
 
     // Mark notification as processed
     await db.collection('notifications').updateOne(
@@ -151,17 +176,12 @@ export async function POST(req: NextRequest) {
       { 
         $set: { 
           processed: true,
-          processed_at: currentTime,
-          updated_at: currentTime
-        } 
+          processed_at: currentTime
+        }
       }
     );
 
-    return NextResponse.json(
-      { message: 'Notification processed successfully' },
-      { status: 200 }
-    );
-
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error processing Ozow notification:', error);
     return NextResponse.json(

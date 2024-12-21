@@ -10,18 +10,28 @@ function trimLeadingZeros(hash: string): string {
   return hash.replace(/^0+/, '');
 }
 
+// Convert object to URL-encoded form data
+function objectToFormData(obj: Record<string, any>): URLSearchParams {
+  const formData = new URLSearchParams();
+  for (const [key, value] of Object.entries(obj)) {
+    // Convert boolean to string 'true' or 'false'
+    formData.append(key, String(value));
+  }
+  return formData;
+}
+
 // Function to generate a valid Ozow notification with correct hash
 function generateOzowNotification({
-  siteCode = process.env.OZOW_SITE_CODE || 'test001',
+  siteCode = process.env.OZOW_SITE_CODE || 'TSTSTE0001',
   transactionId = `test${Date.now()}`,
   transactionReference,
   amount,
   status,
   statusMessage = '',
-  currencyCode = 'zar',
+  currencyCode = 'ZAR',
   isTest = true,
-  bankName = 'test bank',
-  privateKey = process.env.OZOW_PRIVATE_KEY || 'test_private_key'
+  bankName = 'Absa Pay',
+  privateKey = process.env.OZOW_PRIVATE_KEY || '215114531AFF7134A94C88CEEA48E'
 }: {
   siteCode?: string;
   transactionId?: string;
@@ -34,22 +44,25 @@ function generateOzowNotification({
   bankName?: string;
   privateKey?: string;
 }) {
-  // Create notification object with lowercase values
+  // Format amount to 2 decimal places
+  const formattedAmount = amount.toFixed(2);
+  
+  // Create notification object with exact casing as per Ozow docs
   const notification = {
-    SiteCode: siteCode.toLowerCase(),
-    TransactionId: transactionId.toLowerCase(),
-    TransactionReference: transactionReference.toLowerCase(),
-    Amount: amount,
-    Status: status.toLowerCase(),
+    SiteCode: siteCode,
+    TransactionId: transactionId,
+    TransactionReference: transactionReference,
+    Amount: formattedAmount,
+    Status: status,
     Optional1: '',
     Optional2: '',
     Optional3: '',
     Optional4: '',
     Optional5: '',
-    CurrencyCode: currencyCode.toLowerCase(),
+    CurrencyCode: currencyCode,
     IsTest: isTest,
-    StatusMessage: statusMessage.toLowerCase(),
-    BankName: bankName.toLowerCase(),
+    StatusMessage: statusMessage,
+    BankName: bankName,
     MaskedAccountNumber: '****1234',
     SmartIndicators: ''
   };
@@ -71,7 +84,7 @@ function generateOzowNotification({
     notification.StatusMessage
   ].join('');
 
-  // Add private key and convert to lowercase (though everything is already lowercase now)
+  // Add private key and convert to lowercase
   const withKey = (concatenated + privateKey).toLowerCase();
   
   // Generate hash
@@ -88,73 +101,65 @@ function generateOzowNotification({
 export async function testOzowNotifications() {
   const baseUrl = 'http://localhost:3000/api/ozow/notify';
   
+  // Helper function to send notification
+  async function sendNotification(notification: Record<string, any>) {
+    const formData = objectToFormData(notification);
+    console.log('\nSending notification:');
+    console.log(Object.fromEntries(formData));
+    
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString()
+    });
+    
+    const result = await response.json();
+    console.log('Response:', {
+      status: response.status,
+      body: result
+    });
+    return response;
+  }
+
   // Test successful payment
   console.log('\nTesting Successful Payment...');
-  const successResponse = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(generateOzowNotification({
-      transactionReference: '102',
-      amount: 100,
-      status: 'complete',
-      statusMessage: 'payment successful'
-    }))
+  const successNotification = generateOzowNotification({
+    transactionReference: '6766af5229001a59b0cbc947',
+    amount: 53.00,
+    status: 'Complete',
+    statusMessage: 'Test transaction completed'
   });
-  console.log('Response:', {
-    status: successResponse.status,
-    data: await successResponse.json()
+  await sendNotification(successNotification);
+
+  // Test failed payment
+  console.log('\nTesting Failed Payment...');
+  const failedNotification = generateOzowNotification({
+    transactionReference: '6766af5229001a59b0cbc948',
+    amount: 53.00,
+    status: 'Error',
+    statusMessage: 'Insufficient funds'
   });
+  await sendNotification(failedNotification);
 
   // Test cancelled payment
   console.log('\nTesting Cancelled Payment...');
-  const cancelledResponse = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(generateOzowNotification({
-      transactionReference: '102',
-      amount: 100,
-      status: 'cancelled',
-      statusMessage: 'user cancelled the payment'
-    }))
+  const cancelledNotification = generateOzowNotification({
+    transactionReference: '6766af5229001a59b0cbc949',
+    amount: 53.00,
+    status: 'Cancelled',
+    statusMessage: 'User cancelled'
   });
-  console.log('Response:', {
-    status: cancelledResponse.status,
-    data: await cancelledResponse.json()
-  });
-
-  // Test error payment
-  console.log('\nTesting Error Payment...');
-  const errorResponse = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(generateOzowNotification({
-      transactionReference: '102',
-      amount: 100,
-      status: 'error',
-      statusMessage: 'bank declined transaction'
-    }))
-  });
-  console.log('Response:', {
-    status: errorResponse.status,
-    data: await errorResponse.json()
-  });
+  await sendNotification(cancelledNotification);
 
   // Test pending investigation
   console.log('\nTesting Pending Investigation...');
-  const pendingResponse = await fetch(baseUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(generateOzowNotification({
-      transactionReference: '102',
-      amount: 100,
-      status: 'pendinginvestigation',
-      statusMessage: 'transaction under review'
-    }))
+  const pendingNotification = generateOzowNotification({
+    transactionReference: '6766af5229001a59b0cbc950',
+    amount: 53.00,
+    status: 'PendingInvestigation',
+    statusMessage: 'Manual verification required'
   });
-  console.log('Response:', {
-    status: pendingResponse.status,
-    data: await pendingResponse.json()
-  });
+  await sendNotification(pendingNotification);
 }
 
 // Run tests if called directly
