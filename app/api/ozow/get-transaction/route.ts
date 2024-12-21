@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
     // Construct the Ozow API URL
     const baseUrl = isTest 
-      ? "https://stagingapi.ozow.com"
+      ? "https://api.ozow.com"
       : "https://api.ozow.com";
     
     const url = `${baseUrl}/GetTransaction?siteCode=${siteCode}&transactionId=${transactionId}`;
