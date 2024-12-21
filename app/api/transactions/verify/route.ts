@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
+import { ObjectId } from 'mongodb'
 
 export async function POST(req: Request) {
   try {
@@ -16,12 +17,13 @@ export async function POST(req: Request) {
       hash
     } = await req.json()
 
-    // Find the transaction by transaction reference instead of ObjectId
+    // Find the transaction by _id
     const transaction = await db.collection("transactions").findOne({
-      transaction_reference: transactionReference
+      _id: new ObjectId(transactionReference)
     })
 
     if (!transaction) {
+      console.log('Transaction not found:', transactionReference)
       return NextResponse.json(
         { error: "Transaction not found" },
         { status: 404 }
@@ -31,6 +33,7 @@ export async function POST(req: Request) {
     // Verify amount matches
     const totalAmount = transaction.amount + transaction.fee
     if (Number(amount) !== totalAmount) {
+      console.log('Amount mismatch:', { expected: totalAmount, received: amount })
       return NextResponse.json(
         { error: "Amount mismatch" },
         { status: 400 }
@@ -59,9 +62,9 @@ export async function POST(req: Request) {
       })
     }
 
-    // Update transaction status using transaction_reference
+    // Update transaction status using _id
     await db.collection("transactions").updateOne(
-      { transaction_reference: transactionReference },
+      { _id: new ObjectId(transactionReference) },
       { $set: updateData }
     )
 

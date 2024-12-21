@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import crypto from 'crypto';
+import { ObjectId } from 'mongodb';
 
 // Types based on Ozow documentation
 interface OzowNotification {
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest) {
 
     // Update transaction
     await db.collection('transactions').updateOne(
-      { transaction_reference: notification.TransactionReference },
+      { _id: new ObjectId(notification.TransactionReference) },
       { $set: updateData }
     );
 
