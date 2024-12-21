@@ -8,7 +8,7 @@ interface OzowNotification {
   SiteCode: string;
   TransactionId: string;
   TransactionReference: string;
-  Amount: number;
+  Amount: string | number;
   Status: string;
   Optional1?: string;
   Optional2?: string;
@@ -16,7 +16,7 @@ interface OzowNotification {
   Optional4?: string;
   Optional5?: string;
   CurrencyCode: string;
-  IsTest: boolean;
+  IsTest: boolean | string;
   StatusMessage?: string;
   Hash: string;
   SubStatus?: string;
@@ -32,44 +32,68 @@ function trimLeadingZeros(hash: string): string {
 
 function validateOzowHash(notification: OzowNotification): boolean {
   // Use test private key if env variable is not set
-  const privateKey = process.env.OZOW_PRIVATE_KEY || 'test_private_key';
+  const privateKey = process.env.OZOW_PRIVATE_KEY || '215114531AFF7134A94C88CEEA48E';
   
-  // Concatenate variables in order
+  // Ensure amount is a string with 2 decimal places if it's a number
+  const amount = typeof notification.Amount === 'number' 
+    ? notification.Amount.toFixed(2)
+    : notification.Amount;
+
+  // Convert IsTest to string 'true' or 'false'
+  const isTest = String(notification.IsTest).toLowerCase();
+  
+  // Concatenate variables in exact order from docs (1-13)
   const concatenated = [
-    notification.SiteCode,
-    notification.TransactionId,
-    notification.TransactionReference,
-    notification.Amount,
-    notification.Status,
-    notification.Optional1 || '',
-    notification.Optional2 || '',
-    notification.Optional3 || '',
-    notification.Optional4 || '',
-    notification.Optional5 || '',
-    notification.CurrencyCode,
-    notification.IsTest,
-    notification.StatusMessage || ''
+    notification.SiteCode,          // 1
+    notification.TransactionId,     // 2
+    notification.TransactionReference, // 3
+    amount,                         // 4
+    notification.Status,            // 5
+    notification.Optional1 || '',   // 6
+    notification.Optional2 || '',   // 7
+    notification.Optional3 || '',   // 8
+    notification.Optional4 || '',   // 9
+    notification.Optional5 || '',   // 10
+    notification.CurrencyCode,      // 11
+    isTest,                        // 12
+    notification.StatusMessage || '' // 13
   ].join('');
 
   // Add private key and convert to lowercase
   const withKey = (concatenated + privateKey).toLowerCase();
   
-  console.log('Validation:');
-  console.log('Concatenated string:', concatenated);
-  console.log('Private key:', privateKey);
-  console.log('Final string:', withKey);
+  console.log('Hash Validation Details:');
+  console.log('1. Original Values:');
+  console.log('  SiteCode:', notification.SiteCode);
+  console.log('  TransactionId:', notification.TransactionId);
+  console.log('  TransactionReference:', notification.TransactionReference);
+  console.log('  Amount:', amount);
+  console.log('  Status:', notification.Status);
+  console.log('  CurrencyCode:', notification.CurrencyCode);
+  console.log('  IsTest:', isTest);
+  console.log('  StatusMessage:', notification.StatusMessage);
+  
+  console.log('\n2. Concatenated String (before lowercase):', concatenated);
+  console.log('3. With Private Key (after lowercase):', withKey);
   
   // Generate SHA512 hash
   const calculatedHash = crypto.createHash('sha512')
     .update(withKey)
     .digest('hex');
 
-  console.log('Calculated hash:', calculatedHash);
-  console.log('Received hash:', notification.Hash);
-
+  console.log('\n4. Hashes:');
+  console.log('  Calculated:', calculatedHash);
+  console.log('  Received: ', notification.Hash);
+  
   // Compare hashes (trim leading zeros)
-  const result = trimLeadingZeros(calculatedHash) === trimLeadingZeros(notification.Hash);
-  console.log('Hash comparison result:', result);
+  const trimmedCalculated = trimLeadingZeros(calculatedHash);
+  const trimmedReceived = trimLeadingZeros(notification.Hash);
+  const result = trimmedCalculated === trimmedReceived;
+  
+  console.log('\n5. After trimming zeros:');
+  console.log('  Calculated:', trimmedCalculated);
+  console.log('  Received: ', trimmedReceived);
+  console.log('  Match:', result);
   
   return result;
 }
@@ -82,7 +106,7 @@ export async function POST(req: NextRequest) {
       SiteCode: formData.get('SiteCode') as string,
       TransactionId: formData.get('TransactionId') as string,
       TransactionReference: formData.get('TransactionReference') as string,
-      Amount: parseFloat(formData.get('Amount') as string),
+      Amount: formData.get('Amount') as string,
       Status: formData.get('Status') as string,
       Optional1: formData.get('Optional1') as string || '',
       Optional2: formData.get('Optional2') as string || '',
