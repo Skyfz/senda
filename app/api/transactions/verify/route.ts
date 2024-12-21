@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
-import { ObjectId } from 'mongodb'
 
 export async function POST(req: Request) {
   try {
@@ -17,9 +16,9 @@ export async function POST(req: Request) {
       hash
     } = await req.json()
 
-    // Find the transaction
+    // Find the transaction by transaction reference instead of ObjectId
     const transaction = await db.collection("transactions").findOne({
-      _id: new ObjectId(transactionReference)
+      transaction_reference: transactionReference
     })
 
     if (!transaction) {
@@ -38,20 +37,45 @@ export async function POST(req: Request) {
       )
     }
 
-    // Update transaction status
+    const currentTime = new Date().toISOString()
+    const updateData = {
+      status: status.toLowerCase(),
+      ozow_transaction_id: ozowTransactionId,
+      status_message: statusMessage,
+      is_test: isTest === 'true',
+      hash: hash,
+      updated_at: currentTime
+    }
+
+    // Add status-specific fields
+    if (status.toLowerCase() === 'complete') {
+      Object.assign(updateData, {
+        completed_at: currentTime
+      })
+    } else if (['cancelled', 'error', 'abandoned'].includes(status.toLowerCase())) {
+      Object.assign(updateData, {
+        failed_at: currentTime,
+        failure_reason: statusMessage
+      })
+    }
+
+    // Update transaction status using transaction_reference
     await db.collection("transactions").updateOne(
-      { _id: new ObjectId(transactionReference) },
-      { 
-        $set: { 
-          status: status.toLowerCase(),
-          ozow_transaction_id: ozowTransactionId,
-          status_message: statusMessage,
-          is_test: isTest === 'true',
-          hash: hash,
-          updated_at: new Date().toISOString()
-        } 
-      }
+      { transaction_reference: transactionReference },
+      { $set: updateData }
     )
+
+    // Log verification
+    await db.collection("verification_logs").insertOne({
+      transaction_reference: transactionReference,
+      ozow_transaction_id: ozowTransactionId,
+      status,
+      status_message: statusMessage,
+      amount,
+      is_test: isTest === 'true',
+      hash,
+      created_at: currentTime
+    })
 
     // If transaction is complete, update wallet balance
     if (status.toLowerCase() === 'complete') {
@@ -82,12 +106,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      transaction_id: transactionReference,
+      message: "Transaction verified successfully",
       status: status.toLowerCase()
     })
 
   } catch (error) {
-    console.error('Transaction verification error:', error)
+    console.error('Error verifying transaction:', error)
     return NextResponse.json(
       { error: "Failed to verify transaction" },
       { status: 500 }

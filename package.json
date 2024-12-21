@@ -6,7 +6,9 @@
 		"dev": "next dev --turbo",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
+		"lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix",
+		"test:ozow": "tsx utils/test-ozow-notifications.ts",
+		"test:ozow-script": "tsx scripts/test-ozow.ts"
 	},
 	"dependencies": {
 		"@auth/core": "^0.34.2",
@@ -62,6 +64,8 @@
 		"prettier": "3.3.3",
 		"tailwind-variants": "0.1.20",
 		"tailwindcss": "3.4.3",
+		"ts-node": "^10.9.2",
+		"tsx": "^4.19.2",
 		"typescript": "5.6.3"
 	}
 }

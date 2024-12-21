@@ -11,7 +11,7 @@ const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL;
 const cancelUrl = `${vercelUrl}/cancel`;
 const errorUrl = `${vercelUrl}/error`;
 const successUrl = `${vercelUrl}/success`;
-const notifyUrl = `${vercelUrl}/notify`;
+const notifyUrl = `${vercelUrl}/api/ozow/notify`;
 
 export async function POST(req: NextRequest) {
   try {

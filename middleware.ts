@@ -5,9 +5,10 @@ export default auth((req) => {
   const isApiRoute = req.nextUrl.pathname.startsWith('/api')
   const isAuthRoute = req.nextUrl.pathname.startsWith('/api/auth')
   const isPublicRoute = req.nextUrl.pathname === "/signin"
+  const isOzowWebhook = req.nextUrl.pathname.startsWith('/api/ozow/notify')
 
-  // Skip middleware for auth routes
-  if (isAuthRoute) {
+  // Skip middleware for auth routes and Ozow webhook
+  if (isAuthRoute || isOzowWebhook) {
     return NextResponse.next()
   }
 
@@ -30,9 +31,7 @@ export default auth((req) => {
   return NextResponse.next()
 })
 
+// See "Matching Paths" below to learn more
 export const config = {
-  matcher: [
-    // Protect all routes including API routes, except NextAuth routes
-    "/((?!_next/static|_next/image|favicon.ico).*)"
-  ]
+  matcher: ['/((?!api/auth/callback|_next/static|_next/image|favicon.ico).*)'],
 }
