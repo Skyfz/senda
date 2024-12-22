@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     
     const data = await response.json();
 
-    console.log("Fetched transaction:", data);
+    // console.log("Fetched transaction:", data);
     
     return NextResponse.json(data);
 

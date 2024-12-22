@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     }
 
     // Calculate net amount
-    const net_amount = Number(amount) - Number(fee)
+    const net_amount = Number(amount) + Number(fee)
 
     const currentTime = new Date().toISOString()
 

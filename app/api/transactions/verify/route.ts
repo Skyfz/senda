@@ -15,27 +15,39 @@ export async function POST(req: Request) {
       statusMessage,
       isTest,
       hash,
-      ozowApiResponse  // This will be passed from the success page
+      ozowApiResponse
     } = await req.json()
 
-    // Find the notification by _id
-    const notification = await db.collection("transactions").findOne({
+    // Find both the transaction and notification
+    const transaction = await db.collection("transactions").findOne({
       _id: new ObjectId(transactionReference)
     })
 
-    if (!notification) {
-      console.log('Transaction notification not found:', transactionReference)
+    const notification = await db.collection("notifications").findOne({
+      TransactionId: ozowTransactionId
+    })
+
+    if (!transaction) {
+      console.log('Transaction not found:', transactionReference)
       return NextResponse.json(
-        { error: "Transaction notification not found" },
+        { error: "Transaction not found" },
+        { status: 404 }
+      )
+    }
+
+    if (!notification) {
+      console.log('Notification not found for TransactionId:', ozowTransactionId)
+      return NextResponse.json(
+        { error: "Notification not found" },
         { status: 404 }
       )
     }
 
     // Check if transaction is already processed
-    if (notification.is_processed) {
+    if (transaction.is_processed) {
       console.log('Transaction already processed:', transactionReference)
       return NextResponse.json(
-        { error: "Transaction already processed", status: notification.status },
+        { error: "Transaction already processed", status: transaction.status },
         { status: 400 }
       )
     }
@@ -47,7 +59,7 @@ export async function POST(req: Request) {
     if (ozowApiResponse.transactionId !== ozowTransactionId) {
       verificationErrors.push('Ozow TransactionId mismatch')
     }
-    if (notification.ozow_transaction_id && notification.ozow_transaction_id !== ozowTransactionId) {
+    if (notification.TransactionId !== ozowTransactionId) {
       verificationErrors.push('Notification TransactionId mismatch')
     }
 
@@ -55,27 +67,33 @@ export async function POST(req: Request) {
     if (ozowApiResponse.transactionReference !== transactionReference) {
       verificationErrors.push('TransactionReference mismatch with API response')
     }
+    if (notification.TransactionReference !== transactionReference) {
+      verificationErrors.push('TransactionReference mismatch with notification')
+    }
 
     // Compare Amount (converting to numbers for comparison)
     const apiAmount = Number(ozowApiResponse.amount)
-    const notificationAmount = notification.amount + notification.fee
+    const notificationAmount = Number(notification.Amount)
+    const transactionAmount = transaction.amount + transaction.fee
     const successAmount = Number(amount)
 
-    if (apiAmount !== successAmount || apiAmount !== notificationAmount) {
-      verificationErrors.push('Amount mismatch between API, notification, and success parameters')
+    if (apiAmount !== successAmount || apiAmount !== transactionAmount || apiAmount !== notificationAmount) {
+      verificationErrors.push('Amount mismatch between API, notification, transaction, and success parameters')
+      console.log('Amount comparison:', {
+        apiAmount,
+        notificationAmount,
+        transactionAmount,
+        successAmount
+      })
     }
 
     // Compare Status
     if (ozowApiResponse.status.toLowerCase() !== status.toLowerCase()) {
       verificationErrors.push('Status mismatch with API response')
     }
-
-    // // Compare IsTest flag
-    // if (String(ozowApiResponse.isTest) !== String(isTest)) {
-    //   console.log('Ozow isTest flag:', ozowApiResponse.isTest)
-    //   console.log('Success isTest flag:', isTest)
-    //   verificationErrors.push('IsTest flag mismatch')
-    // }
+    if (notification.Status.toLowerCase() !== status.toLowerCase()) {
+      verificationErrors.push('Status mismatch with notification')
+    }
 
     // If any verification errors, return them
     if (verificationErrors.length > 0) {
@@ -119,6 +137,7 @@ export async function POST(req: Request) {
     await db.collection("verification_logs").insertOne({
       transaction_reference: transactionReference,
       ozow_transaction_id: ozowTransactionId,
+      notification_id: notification._id,
       status,
       status_message: statusMessage,
       amount,
@@ -132,7 +151,7 @@ export async function POST(req: Request) {
     if (status.toLowerCase() === 'complete') {
       // Find the wallet first to ensure it exists
       const wallet = await db.collection("wallets").findOne({
-        userId: notification.to_user_id
+        userId: transaction.to_user_id
       });
 
       // Mark transaction as processed before updating wallet
@@ -149,17 +168,17 @@ export async function POST(req: Request) {
       if (!wallet) {
         // Create wallet if it doesn't exist
         await db.collection("wallets").insertOne({
-          userId: notification.to_user_id,
-          balance: notification.amount,
+          userId: transaction.to_user_id,
+          balance: transaction.amount,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
       } else {
         // Update existing wallet
         await db.collection("wallets").updateOne(
-          { userId: notification.to_user_id },
+          { userId: transaction.to_user_id },
           {
-            $inc: { balance: notification.amount },
+            $inc: { balance: transaction.amount },
             $set: { updated_at: new Date().toISOString() }
           }
         );
