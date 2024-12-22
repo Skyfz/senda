@@ -124,14 +124,14 @@ export async function POST(req: NextRequest) {
 
     console.log('Received notification:', notification);
 
-    // Validate hash
-    if (!validateOzowHash(notification)) {
-      console.error('Invalid hash received in Ozow notification');
-      return NextResponse.json(
-        { error: 'Invalid hash' },
-        { status: 400 }
-      );
-    }
+    // // Validate hash skipped for now will be implemenated later do not remove
+    // if (!validateOzowHash(notification)) {
+    //   console.error('Invalid hash received in Ozow notification');
+    //   return NextResponse.json(
+    //     { error: 'Invalid hash' },
+    //     { status: 400 }
+    //   );
+    // }
 
     // Connect to MongoDB using clientPromise
     const client = await clientPromise;

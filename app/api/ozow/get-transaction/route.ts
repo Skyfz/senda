@@ -34,11 +34,11 @@ export async function GET(req: NextRequest) {
     if (!response.ok) {
       throw new Error(`Ozow API returned ${response.status}`);
     }
-
-    const data = await response.json();
     
-    console.log(data);
+    const data = await response.json();
 
+    console.log("Fetched transaction:", data);
+    
     return NextResponse.json(data);
 
   } catch (error: any) {
