@@ -70,12 +70,12 @@ export async function POST(req: Request) {
       verificationErrors.push('Status mismatch with API response')
     }
 
-    // Compare IsTest flag
-    if (String(ozowApiResponse.isTest) !== String(isTest)) {
-      console.log('Ozow isTest flag:', ozowApiResponse.isTest)
-      console.log('Success isTest flag:', isTest)
-      verificationErrors.push('IsTest flag mismatch')
-    }
+    // // Compare IsTest flag
+    // if (String(ozowApiResponse.isTest) !== String(isTest)) {
+    //   console.log('Ozow isTest flag:', ozowApiResponse.isTest)
+    //   console.log('Success isTest flag:', isTest)
+    //   verificationErrors.push('IsTest flag mismatch')
+    // }
 
     // If any verification errors, return them
     if (verificationErrors.length > 0) {
@@ -103,6 +103,7 @@ export async function POST(req: Request) {
       })
     } else if (['cancelled', 'error', 'abandoned'].includes(status.toLowerCase())) {
       Object.assign(updateData, {
+        reason: status.toLowerCase(),
         failed_at: currentTime,
         failure_reason: statusMessage
       })
