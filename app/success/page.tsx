@@ -61,6 +61,8 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
         // First check the transaction status with Ozow
         const ozowResponse = await fetch(`/api/ozow/get-transaction?transactionId=${params.TransactionId}&isTest=${params.IsTest === 'true'}`);
         
+        console.log('Ozow response:', ozowResponse);
+        
         if (!ozowResponse.ok) {
           throw new Error('Failed to verify transaction with Ozow');
         }
