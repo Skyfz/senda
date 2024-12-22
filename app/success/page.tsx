@@ -71,8 +71,8 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
         const transaction = Array.isArray(ozowData) ? ozowData[0] : ozowData;
 
         // Only proceed with local verification if Ozow confirms the transaction is complete
-        if (transaction.Status !== 'Complete') {
-          throw new Error(`Transaction status: ${transaction.Status}. ${transaction.StatusMessage || ''}`);
+        if (transaction.status !== 'Complete') {
+          throw new Error(`Transaction status: ${transaction.status}. ${transaction.statusMessage || ''}`);
         }
 
         // Now verify the transaction in our database
