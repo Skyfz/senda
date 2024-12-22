@@ -58,6 +58,22 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
 
       setLoading(true);
       try {
+        // First check the transaction status with Ozow
+        const ozowResponse = await fetch(`/api/ozow/get-transaction?siteCode=${process.env.OZOW_SITE_CODE}&transactionId=${params.TransactionId}&isTest=${params.IsTest === 'true'}`);
+        
+        if (!ozowResponse.ok) {
+          throw new Error('Failed to verify transaction with Ozow');
+        }
+
+        const ozowData = await ozowResponse.json();
+        const transaction = Array.isArray(ozowData) ? ozowData[0] : ozowData;
+
+        // Only proceed with local verification if Ozow confirms the transaction is complete
+        if (transaction.Status !== 'Complete') {
+          throw new Error(`Transaction status: ${transaction.Status}. ${transaction.StatusMessage || ''}`);
+        }
+
+        // Now verify the transaction in our database
         const response = await fetch('/api/transactions/verify', {
           method: 'POST',
           headers: {

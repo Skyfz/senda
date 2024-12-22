@@ -31,8 +31,7 @@ function trimLeadingZeros(hash: string): string {
 }
 
 function validateOzowHash(notification: OzowNotification): boolean {
-  // Use test private key if env variable is not set
-  const privateKey = process.env.OZOW_PRIVATE_KEY || '215114531AFF7134A94C88CEEA48E';
+  const privateKey = process.env.OZOW_PRIVATE_KEY;
   
   // Ensure amount is a string with 2 decimal places if it's a number
   const amount = typeof notification.Amount === 'number' 
