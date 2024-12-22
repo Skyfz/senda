@@ -72,6 +72,8 @@ export async function POST(req: Request) {
 
     // Compare IsTest flag
     if (String(ozowApiResponse.isTest) !== String(isTest)) {
+      console.log('Ozow isTest flag:', ozowApiResponse.isTest)
+      console.log('Success isTest flag:', isTest)
       verificationErrors.push('IsTest flag mismatch')
     }
 
