@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 
 // Types based on Ozow documentation
 interface OzowNotification {
-  SiteCode: string;
+  SiteCode?: string;
   TransactionId: string;
   TransactionReference: string;
   Amount: string | number;
@@ -43,7 +43,7 @@ function validateOzowHash(notification: OzowNotification): boolean {
   
   // Concatenate variables in exact order from docs (1-13)
   const concatenated = [
-    notification.SiteCode,          // 1
+    notification.SiteCode || '',          // 1
     notification.TransactionId,     // 2
     notification.TransactionReference, // 3
     amount,                         // 4
@@ -102,25 +102,45 @@ export async function POST(req: NextRequest) {
     // Parse form data
     const formData = await req.formData();
     const notification: OzowNotification = {
-      SiteCode: formData.get('SiteCode') as string,
       TransactionId: formData.get('TransactionId') as string,
       TransactionReference: formData.get('TransactionReference') as string,
       Amount: formData.get('Amount') as string,
       Status: formData.get('Status') as string,
-      Optional1: formData.get('Optional1') as string || '',
-      Optional2: formData.get('Optional2') as string || '',
-      Optional3: formData.get('Optional3') as string || '',
-      Optional4: formData.get('Optional4') as string || '',
-      Optional5: formData.get('Optional5') as string || '',
       CurrencyCode: formData.get('CurrencyCode') as string,
       IsTest: formData.get('IsTest') === 'true',
-      StatusMessage: formData.get('StatusMessage') as string || '',
       Hash: formData.get('Hash') as string,
-      SubStatus: formData.get('SubStatus') as string || '',
-      MaskedAccountNumber: formData.get('MaskedAccountNumber') as string || '',
-      BankName: formData.get('BankName') as string || '',
-      SmartIndicators: formData.get('SmartIndicators') as string || ''
     };
+
+    // Only add optional fields if they have values
+    const optional1 = formData.get('Optional1') as string;
+    if (optional1) notification.Optional1 = optional1;
+    
+    const optional2 = formData.get('Optional2') as string;
+    if (optional2) notification.Optional2 = optional2;
+    
+    const optional3 = formData.get('Optional3') as string;
+    if (optional3) notification.Optional3 = optional3;
+    
+    const optional4 = formData.get('Optional4') as string;
+    if (optional4) notification.Optional4 = optional4;
+    
+    const optional5 = formData.get('Optional5') as string;
+    if (optional5) notification.Optional5 = optional5;
+
+    const statusMessage = formData.get('StatusMessage') as string;
+    if (statusMessage) notification.StatusMessage = statusMessage;
+
+    const subStatus = formData.get('SubStatus') as string;
+    if (subStatus) notification.SubStatus = subStatus;
+
+    const maskedAccountNumber = formData.get('MaskedAccountNumber') as string;
+    if (maskedAccountNumber) notification.MaskedAccountNumber = maskedAccountNumber;
+
+    const bankName = formData.get('BankName') as string;
+    if (bankName) notification.BankName = bankName;
+
+    const smartIndicators = formData.get('SmartIndicators') as string;
+    if (smartIndicators) notification.SmartIndicators = smartIndicators;
 
     console.log('Received notification:', notification);
 
@@ -156,8 +176,7 @@ export async function POST(req: NextRequest) {
     const notificationWithTimestamp = {
       ...notification,
       created_at: currentTime,
-      updated_at: currentTime,
-      processed: false
+      updated_at: currentTime
     };
 
     await db.collection('notifications').insertOne(notificationWithTimestamp);
@@ -198,7 +217,6 @@ export async function POST(req: NextRequest) {
       { TransactionId: notification.TransactionId },
       { 
         $set: { 
-          processed: true,
           processed_at: currentTime
         }
       }

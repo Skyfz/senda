@@ -104,15 +104,47 @@ export async function POST(req: Request) {
       )
     }
 
+    interface UpdateData {
+      status: any;
+      ozow_transaction_id: any;
+      status_message: any;
+      is_test: boolean;
+      hash: any;
+      updated_at: string;
+      masked_account_number: any;
+      bank_name: any;
+      to_bank_name: any;
+      to_account_number: any;
+      created_date: any;
+      payment_date: any;
+      sub_status: any;
+      smart_indicators: any;
+      [key: string]: any;
+    }
+
     const currentTime = new Date().toISOString()
-    const updateData = {
+    const updateData: UpdateData = {
       status: status.toLowerCase(),
       ozow_transaction_id: ozowTransactionId,
       status_message: statusMessage,
       is_test: isTest === 'true',
       hash: hash,
-      updated_at: currentTime
+      updated_at: currentTime,
+      masked_account_number: ozowApiResponse.maskedAccountNumber,
+      bank_name: ozowApiResponse.bankName,
+      to_bank_name: ozowApiResponse.toBankName,
+      to_account_number: ozowApiResponse.toAccountNumber,
+      created_date: ozowApiResponse.createdDate,
+      payment_date: ozowApiResponse.paymentDate,
+      sub_status: ozowApiResponse.subStatus,
+      smart_indicators: ozowApiResponse.smartIndicators
     }
+
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
 
     // Add status-specific fields
     if (status.toLowerCase() === 'complete') {
