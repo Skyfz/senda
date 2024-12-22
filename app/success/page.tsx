@@ -88,18 +88,28 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
             status: params.Status,
             statusMessage: params.StatusMessage,
             isTest: params.IsTest,
-            hash: params.Hash
+            hash: params.Hash,
+            ozowApiResponse: transaction
           }),
         });
 
         if (!response.ok) {
           const data = await response.json();
-          throw new Error(data.error || 'Failed to verify transaction');
+          if (data.error === 'Transaction already processed') {
+            // If transaction was previously processed, still show success but log it
+            console.log('Transaction was previously processed:', params.TransactionReference);
+            setSuccess(true);
+          } else {
+            throw new Error(data.error || 'Failed to verify transaction');
+          }
+          return;
         }
 
         const result = await response.json();
         if (result.success) {
           setSuccess(true);
+        } else {
+          throw new Error(result.error || 'Failed to verify transaction');
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to verify transaction');

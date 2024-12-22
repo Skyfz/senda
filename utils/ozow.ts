@@ -19,7 +19,7 @@ export function generateOzowHashCheck(data: OzowPaymentData, privateKey: string)
   const inputString = `${data.siteCode}${data.countryCode}${data.currencyCode}${data.amount}${data.transactionReference}${data.bankReference}${data.cancelUrl}${data.errorUrl}${data.successUrl}${data.notifyUrl}${data.isTest}${privateKey}`;
   
   const stringToHash = inputString.toLowerCase();
-  console.log('String before hash:', stringToHash); // For debugging
+  // console.log('String before hash:', stringToHash); // For debugging
   
   const hash = crypto.createHash('sha512');
   hash.update(stringToHash);
