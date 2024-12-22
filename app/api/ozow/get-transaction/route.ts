@@ -22,13 +22,10 @@ export async function GET(req: NextRequest) {
 
     // Construct the Ozow API URL
     const baseUrl = isTest 
-      ? "https://api.ozow.com"
+      ? "https://stagingapi.ozow.com"
       : "https://api.ozow.com";
     
     const url = `${baseUrl}/GetTransaction?siteCode=${siteCode}&transactionId=${transactionId}`;
-
-    console.log("Fetching transaction from Ozow API:", url);
-    console.log("API Key:", apiKey);
 
     // Make request to Ozow API
     const response = await fetch(url, {
@@ -39,6 +36,8 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    console.log("Ozow API Response:", response);
+    
     if (!response.ok) {
       throw new Error(`Ozow API returned ${response.status}`);
     }
