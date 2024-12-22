@@ -27,6 +27,8 @@ export async function GET(req: NextRequest) {
     
     const url = `${baseUrl}/GetTransaction?siteCode=${siteCode}&transactionId=${transactionId}`;
 
+    console.log("Fetching transaction from Ozow API:", url);
+
     // Make request to Ozow API
     const response = await fetch(url, {
       method: "GET",
