@@ -27,6 +27,10 @@ export async function POST(req: Request) {
       TransactionId: ozowTransactionId
     })
 
+    // console.log('Transaction found:', transaction)
+    // console.log('Notification found:', notification)
+    // console.log('Api Response:', ozowApiResponse)
+
     if (!transaction) {
       console.log('Transaction not found:', transactionReference)
       return NextResponse.json(

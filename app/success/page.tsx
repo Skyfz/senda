@@ -31,6 +31,8 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isAlreadyProcessed, setIsAlreadyProcessed] = useState(false);
+  const [transactionDetails, setTransactionDetails] = useState<any>(null);
   const router = useRouter();
   const [params, setParams] = useState<SuccessPageProps['searchParams']>(
     Object.keys(searchParams).length > 0 
@@ -69,7 +71,10 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
 
         const ozowData = await ozowResponse.json();
         const transaction = Array.isArray(ozowData) ? ozowData[0] : ozowData;
-
+        setTransactionDetails(transaction);
+        
+        console.log('Ozow transaction:', transaction);
+        
         // Only proceed with local verification if Ozow confirms the transaction is complete
         if (transaction.status !== 'Complete') {
           throw new Error(`Transaction status: ${transaction.status}. ${transaction.statusMessage || ''}`);
@@ -98,6 +103,7 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
           if (data.error === 'Transaction already processed') {
             // If transaction was previously processed, still show success but log it
             console.log('Transaction was previously processed:', params.TransactionReference);
+            setIsAlreadyProcessed(true);
             setSuccess(true);
           } else {
             throw new Error(data.error || 'Failed to verify transaction');
@@ -158,65 +164,120 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
               </>
             ) : success ? (
               <>
-                <div className="flex justify-between items-center mb-4 px-2">
-                  <div>
-                    <h2 className="text-lg font-semibold pb-1">Transaction Successful</h2>
-                    <p className="text-sm text-default-500">Your deposit has been processed</p>
-                  </div>
+                <div className="flex flex-col justify-between items-center space-y-4 pb-4">
                   <div className="p-3 bg-success/10 rounded-full">
                     <CheckCircle2 className="w-6 h-6 text-success" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold pb-1 text-center">Transaction Successful</h2>
+                    <p className="text-sm text-default-500 text-center">Your deposit has been processed</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <Card isBlurred>
-                    <CardBody className="gap-2">
-                      <div className="flex justify-between text-small">
-                        <span className="text-default-500">Amount:</span>
-                        <span>R {params.Amount}</span>
+                  <Card isBlurred className="border-0">
+                    <CardBody className="gap-3 p-6">
+                      <div className="flex justify-between items-center text-small">
+                        <span className="text-default-500">Amount</span>
+                        <span className="text-3xl font-semibold">R {params.Amount}</span>
                       </div>
-                      <div className="flex justify-between text-small">
-                        <span className="text-default-500">Transaction ID:</span>
+                      
+                      <Divider className="my-2"/>
+                      
+                      <div className="flex justify-between items-center text-small">
+                        <span className="text-default-500 ">Transaction ID</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs">{params.TransactionId}</span>
+                          <span className="text-sm font-medium text-right">{params.TransactionId}</span>
                           <Button
                             isIconOnly
                             size="sm"
-                            variant="light"
+                            variant="flat"
+                            className="bg-default-100 hover:bg-default-200"
                             onClick={() => copyToClipboard(params.TransactionId || '')}
                           >
                             <Copy className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
-                      <div className="flex justify-between text-small">
-                        <span className="text-default-500">Status:</span>
-                        <span className="text-success">{params.Status}</span>
+                      
+                      <div className="flex justify-between items-center text-small">
+                        <span className="text-default-500">Status</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-success animate-pulse"/>
+                          <span className="text-success font-medium">{params.Status}</span>
+                        </div>
                       </div>
-                      {params.IsTest === 'true' && (
-                        <div className="text-warning text-tiny mt-2">
-                          This was a test transaction
+
+                      {params.StatusMessage && (
+                        <div className="flex justify-between items-center text-small">
+                          <span className="text-default-500">Status Message</span>
+                          <span className="text-sm font-medium">{params.StatusMessage}</span>
                         </div>
                       )}
-                      <Divider className="my-2"/>
-                      <div className="text-tiny text-default-400">
-                        Transaction processed by Ozow
+
+                      {transactionDetails?.bankName && (
+                        <>
+                          <div className="flex justify-between items-center text-small">
+                            <span className="text-default-500">Bank Name</span>
+                            <span className="text-sm font-medium">{transactionDetails.bankName}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-small">
+                            <span className="text-default-500">Account Number</span>
+                            <span className="text-sm font-medium">{transactionDetails.maskedAccountNumber}</span>
+                          </div>
+                        </>
+                      )}
+
+                      <div className="flex justify-between items-center text-small">
+                        <span className="text-default-500">Date & Time</span>
+                        <span className="text-sm font-medium">
+                          {new Date().toLocaleString('en-ZA', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                          })}
+                        </span>
                       </div>
+
+                      {isAlreadyProcessed && (
+                        <div className="mt-2 p-2 bg-warning-50 rounded-lg">
+                          <p className="text-warning text-sm flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4" />
+                            This transaction was previously processed
+                          </p>
+                        </div>
+                      )}
+
+                      {params.IsTest === 'true' && (
+                        <div className="p-2 bg-warning-50 rounded-lg">
+                          <p className="text-warning text-sm flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4" />
+                            This was a test transaction
+                          </p>
+                        </div>
+                      )}
                     </CardBody>
                   </Card>
 
-                  <div className="flex justify-center gap-2 pt-4">
+                  <div className="flex justify-center gap-4 mt-6">
                     <Button 
                       color="primary"
-                      onClick={() => router.push('/wallet')}
+                      size="lg"
+                      className="font-medium"
+                      onClick={() => router.push('/deposit')}
                     >
-                      View Wallet
+                      Make Another Deposit
                     </Button>
                     <Button 
                       variant="bordered"
-                      onClick={() => router.push('/deposit')}
+                      size="lg"
+                      className="font-medium"
+                      onClick={() => router.push('/')}
                     >
-                      New Deposit
+                      Go Home
                     </Button>
                   </div>
                 </div>
