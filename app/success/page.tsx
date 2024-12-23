@@ -186,7 +186,7 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                 </div>
 
                 <div className="space-y-6">
-                      <div className="flex justify-between items-center text-small py-4 mt-4">
+                      <div className="flex justify-between items-center text-small pt-4">
                         <span className="text-default-500">Amount</span>
                             <span className="text-4xl font-semibold">{transactionDetails.currencyCode }&nbsp;{params.Amount}</span>
                       </div>
@@ -221,12 +221,12 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                         </span>
                       </div>
                           
-                      {params.StatusMessage && (
+                      {/* {params.StatusMessage && (
                         <div className="flex justify-between items-center text-small">
                           <span className="text-default-500">Status Message</span>
                           <span className="text-sm font-medium">{params.StatusMessage}</span>
                         </div>
-                      )}
+                      )} */}
                       
                       <div className="flex justify-between items-center text-small">
                         <span className="text-default-500 ">Transaction ID</span>
@@ -244,24 +244,26 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                         </div>
                       </div>
                       
-                      {isAlreadyProcessed && (
-                        <div className="mt-2 p-2 bg-default-50 rounded-lg">
-                          <p className="text-foreground text-sm flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4" />
-                            This transaction is already processed
-                          </p>
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        {isAlreadyProcessed && (
+                          <div className="mt-2 p-2 bg-default-50 rounded-lg">
+                            <p className="text-foreground text-sm flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4" />
+                              This transaction is already processed
+                            </p>
+                          </div>
+                        )}
 
-                      {params.IsTest === 'true' && (
-                        <div className="p-2 bg-warning-50 rounded-lg">
-                          <p className="text-warning text-sm flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4" />
-                            This was a test transaction
-                          </p>
-                        </div>
-                      )}
-
+                        {params.IsTest === 'true' && (
+                          <div className="p-2 bg-warning-50 rounded-lg">
+                            <p className="text-warning text-sm flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4" />
+                              This was a test transaction
+                            </p>
+                          </div>
+                        )} 
+                    </div>
+                    
                   <div className="flex justify-center gap-4 mt-6">
                     <Button 
                       color="primary"

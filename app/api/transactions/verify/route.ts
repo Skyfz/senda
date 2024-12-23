@@ -18,6 +18,15 @@ export async function POST(req: Request) {
       ozowApiResponse
     } = await req.json()
 
+    // console.log('ref',transactionReference)
+    // console.log('Ozow Transaction ID:', ozowTransactionId)
+    // console.log('Amount:', amount)
+    // console.log('Status:', status)
+    // console.log('Status Message:', statusMessage)
+    // console.log('Is Test:', isTest)
+    // console.log('Hash:', hash)
+    // console.log('Ozow API Response:', ozowApiResponse)
+
     // Find both the transaction and notification
     const transaction = await db.collection("transactions").findOne({
       _id: new ObjectId(transactionReference)
@@ -125,7 +134,6 @@ export async function POST(req: Request) {
       smart_indicators: any;
       [key: string]: any;
     }
-
     const currentTime = new Date().toISOString()
     const updateData: UpdateData = {
       status: status.toLowerCase(),
@@ -182,6 +190,7 @@ export async function POST(req: Request) {
       api_response: ozowApiResponse,
       created_at: currentTime
     })
+
 
     // If transaction is complete, update wallet balance
     if (status.toLowerCase() === 'complete') {
