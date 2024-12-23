@@ -177,23 +177,23 @@ export async function POST(req: Request) {
       { $set: updateData }
     )
 
-    // Log verification
-    await db.collection("verification_logs").insertOne({
-      transaction_reference: transactionReference,
-      ozow_transaction_id: ozowTransactionId,
-      notification_id: notification._id,
-      status,
-      status_message: statusMessage,
-      amount,
-      is_test: isTest === 'true',
-      hash,
-      api_response: ozowApiResponse,
-      created_at: currentTime
-    })
-
-
     // If transaction is complete, update wallet balance
     if (status.toLowerCase() === 'complete') {
+
+      // Log verification
+      await db.collection("verification_logs").insertOne({
+        transaction_reference: transactionReference,
+        ozow_transaction_id: ozowTransactionId,
+        notification_id: notification._id,
+        status,
+        status_message: statusMessage,
+        amount,
+        is_test: isTest === 'true',
+        hash,
+        api_response: ozowApiResponse,
+        created_at: currentTime
+      })
+      
       // Find the wallet first to ensure it exists
       const wallet = await db.collection("wallets").findOne({
         userId: transaction.to_user_id
