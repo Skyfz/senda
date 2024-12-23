@@ -50,6 +50,7 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
           };
         })()
   );
+  const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
   useEffect(() => {
     const verifyTransaction = async () => {
@@ -73,7 +74,17 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
         const transaction = Array.isArray(ozowData) ? ozowData[0] : ozowData;
         setTransactionDetails(transaction);
         
-        console.log('Ozow transaction:', transaction);
+        // console.log('Ozow transaction:', transaction);
+        const formattedDate = new Intl.DateTimeFormat('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        }).format(new Date(transaction.paymentDate));
+        setFormattedDate(formattedDate);
         
         // Only proceed with local verification if Ozow confirms the transaction is complete
         if (transaction.status !== 'Complete') {
@@ -134,7 +145,7 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
   return (
     <section className="flex flex-col w-full items-center justify-center">
       <div className="min-h-screen w-full max-w-2xl">
-        <Card className="bg-opacity-50">
+        <Card isBlurred className="bg-opacity-50">
           <CardBody className="py-5 px-4">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-8 gap-4">
@@ -149,7 +160,7 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                     <p className="text-sm text-danger">There was an error processing your payment</p>
                   </div>
                   <div className="p-3 bg-danger/10 rounded-full">
-                    <AlertCircle className="w-6 h-6 text-danger" />
+                    <AlertCircle className="w-8 h-8 text-danger" />
                   </div>
                 </div>
                 <div className="text-center py-8">
@@ -166,7 +177,7 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
               <>
                 <div className="flex flex-col justify-between items-center space-y-4 pb-4">
                   <div className="p-3 bg-success/10 rounded-full">
-                    <CheckCircle2 className="w-6 h-6 text-success" />
+                    <CheckCircle2 className="w-8 h-8 text-success" />
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold pb-1 text-center">Transaction Successful</h2>
@@ -174,15 +185,48 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <Card isBlurred className="border-0">
-                    <CardBody className="gap-3 p-6">
-                      <div className="flex justify-between items-center text-small">
+                <div className="space-y-6">
+                      <div className="flex justify-between items-center text-small py-4 mt-4">
                         <span className="text-default-500">Amount</span>
-                        <span className="text-3xl font-semibold">R {params.Amount}</span>
+                            <span className="text-4xl font-semibold">{transactionDetails.currencyCode }&nbsp;{params.Amount}</span>
                       </div>
                       
-                      <Divider className="my-2"/>
+                      <Divider className="my-4" />
+                          
+                      {transactionDetails?.bankName && (
+                        <>
+                          <div className="flex justify-between items-center text-small">
+                            <span className="text-default-500">Bank Name</span>
+                            <span className="text-sm font-medium">{transactionDetails.bankName}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-small">
+                            <span className="text-default-500">Account Number</span>
+                            <span className="text-sm font-medium">{transactionDetails.maskedAccountNumber}</span>
+                          </div>
+                        </>
+                      )}
+                          
+                      <div className="flex justify-between items-center text-small">
+                        <span className="text-default-500">Status</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-success animate-pulse"/>
+                          <span className="text-success font-medium">{params.Status}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center text-small">
+                        <span className="text-default-500">Date & Time</span>
+                        <span className="text-sm font-medium">
+                          {formattedDate}
+                        </span>
+                      </div>
+                          
+                      {params.StatusMessage && (
+                        <div className="flex justify-between items-center text-small">
+                          <span className="text-default-500">Status Message</span>
+                          <span className="text-sm font-medium">{params.StatusMessage}</span>
+                        </div>
+                      )}
                       
                       <div className="flex justify-between items-center text-small">
                         <span className="text-default-500 ">Transaction ID</span>
@@ -200,53 +244,11 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                         </div>
                       </div>
                       
-                      <div className="flex justify-between items-center text-small">
-                        <span className="text-default-500">Status</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-success animate-pulse"/>
-                          <span className="text-success font-medium">{params.Status}</span>
-                        </div>
-                      </div>
-
-                      {params.StatusMessage && (
-                        <div className="flex justify-between items-center text-small">
-                          <span className="text-default-500">Status Message</span>
-                          <span className="text-sm font-medium">{params.StatusMessage}</span>
-                        </div>
-                      )}
-
-                      {transactionDetails?.bankName && (
-                        <>
-                          <div className="flex justify-between items-center text-small">
-                            <span className="text-default-500">Bank Name</span>
-                            <span className="text-sm font-medium">{transactionDetails.bankName}</span>
-                          </div>
-                          <div className="flex justify-between items-center text-small">
-                            <span className="text-default-500">Account Number</span>
-                            <span className="text-sm font-medium">{transactionDetails.maskedAccountNumber}</span>
-                          </div>
-                        </>
-                      )}
-
-                      <div className="flex justify-between items-center text-small">
-                        <span className="text-default-500">Date & Time</span>
-                        <span className="text-sm font-medium">
-                          {new Date().toLocaleString('en-ZA', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true
-                          })}
-                        </span>
-                      </div>
-
                       {isAlreadyProcessed && (
-                        <div className="mt-2 p-2 bg-warning-50 rounded-lg">
-                          <p className="text-warning text-sm flex items-center gap-2">
+                        <div className="mt-2 p-2 bg-default-50 rounded-lg">
+                          <p className="text-foreground text-sm flex items-center gap-2">
                             <AlertCircle className="w-4 h-4" />
-                            This transaction was previously processed
+                            This transaction is already processed
                           </p>
                         </div>
                       )}
@@ -259,8 +261,6 @@ export default function SuccessPage({ searchParams }: SuccessPageProps) {
                           </p>
                         </div>
                       )}
-                    </CardBody>
-                  </Card>
 
                   <div className="flex justify-center gap-4 mt-6">
                     <Button 

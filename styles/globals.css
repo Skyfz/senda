@@ -12,3 +12,21 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+
+/* Prevent zooming on touch devices */
+html, body {
+    touch-action: manipulation; /* Prevents double-tap zoom */
+    overflow: hidden; /* Prevents scrolling */
+}
+
+/* Optional: Prevent text selection */
+* {
+    user-select: none; /* Prevents text selection */
+}
+
+/* Optional: Prevent pinch zoom */
+@media (hover: none) {
+    body {
+        touch-action: pan-x pan-y; /* Allows panning but not zooming */
+    }
+}
