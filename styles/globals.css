@@ -16,7 +16,7 @@
 /* Prevent zooming on touch devices */
 html, body {
     touch-action: manipulation; /* Prevents double-tap zoom */
-    overflow: hidden; /* Prevents scrolling */
+    
 }
 
 /* Optional: Prevent text selection */
