@@ -84,10 +84,10 @@ export default function CancelPage({ searchParams }: CancelPageProps) {
         const transaction = Array.isArray(ozowData) ? ozowData[0] : ozowData;
         setTransactionDetails(transaction);
         
-        // Only proceed with local verification if Ozow confirms the transaction is complete
-        if (transaction.status !== 'Cancelled') {
-          throw new Error(`Transaction status: ${transaction.status}. ${transaction.statusMessage || ''}`);
-        }
+        // // Only proceed with local verification if Ozow confirms the transaction is complete
+        // if (transaction.status !== 'Cancelled') {
+        //   throw new Error(`Transaction status: ${transaction.status}. ${transaction.statusMessage || ''}`);
+        // }
 
         // Now verify the transaction in our database
         const response = await fetch('/api/transactions/verify', {
@@ -106,17 +106,6 @@ export default function CancelPage({ searchParams }: CancelPageProps) {
             ozowApiResponse: transaction
           }),
         });
-
-        // const formattedDate = new Intl.DateTimeFormat('en-US', {
-        //   year: 'numeric',
-        //   month: '2-digit',
-        //   day: '2-digit',
-        //   hour: '2-digit',
-        //   minute: '2-digit',
-        //   second: '2-digit',
-        //   hour12: false,
-        // }).format(new Date(transaction.paymentDate));
-        // setFormattedDate(formattedDate);
 
         if (!response.ok) {
           const data = await response.json();
@@ -207,13 +196,6 @@ export default function CancelPage({ searchParams }: CancelPageProps) {
                   <span className="text-danger font-medium">{params.Status}</span>
                 </div>
               </div>
-
-              {/* <div className="flex justify-between items-center text-small">
-                <span className="text-default-500">Date & Time</span>
-                <span className="text-sm font-medium">
-                  {formattedDate}
-                </span>
-              </div> */}
 
               <div className="flex justify-between items-center text-small">
                         <span className="text-default-500 ">Transaction ID</span>

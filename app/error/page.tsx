@@ -74,7 +74,7 @@ export default function ErrorPage({ searchParams }: ErrorPageProps) {
         // First check the transaction status with Ozow
         const ozowResponse = await fetch(`/api/ozow/get-transaction?transactionId=${params.TransactionId}&isTest=${params.IsTest === 'true'}`);
         
-        console.log('Ozow response:', ozowResponse);
+        // console.log('Ozow response:', ozowResponse);
         
         if (!ozowResponse.ok) {
           throw new Error('Failed to verify transaction with Ozow');
@@ -84,10 +84,10 @@ export default function ErrorPage({ searchParams }: ErrorPageProps) {
         const transaction = Array.isArray(ozowData) ? ozowData[0] : ozowData;
         setTransactionDetails(transaction);
         
-        // Only proceed with local verification if Ozow confirms the transaction is complete
-        if (transaction.status !== 'Error') {
-          throw new Error(`Transaction status: ${transaction.status}. ${transaction.statusMessage || ''}`);
-        }
+        // // Only proceed with local verification if Ozow confirms the transaction is complete
+        // if (transaction.status !== 'Error') {
+        //   throw new Error(`Transaction status: ${transaction.status}. ${transaction.statusMessage || ''}`);
+        // }
 
         // Now verify the transaction in our database
         const response = await fetch('/api/transactions/verify', {
@@ -117,6 +117,9 @@ export default function ErrorPage({ searchParams }: ErrorPageProps) {
         //   hour12: false,
         // }).format(new Date(transaction.paymentDate));
         // setFormattedDate(formattedDate);
+
+        // console.log("Params")
+        // console.log(params)
 
         if (!response.ok) {
           const data = await response.json();

@@ -170,6 +170,7 @@ export async function POST(req: Request) {
         failure_reason: statusMessage
       })
     }
+    // console.log(updateData)
 
     // Update transaction status using _id
     await db.collection("transactions").updateOne(
