@@ -1,22 +1,36 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Card, CardBody, Avatar, ScrollShadow, Button, Divider } from "@nextui-org/react";
 import { Plus, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useUser } from '@/context/user-context';
+
+interface Contact {
+  image: string; // Add other properties as needed
+  name: string;
+  status: string; // Assuming status is a string, adjust if necessary
+  email: string;
+}
 
 export default function RecentContacts() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const contacts = [
-    { name: "Sarah M.", img: "https://i.pravatar.cc/150?u=a042581f4e29026024d", status: "online" },
-    { name: "John D.", img: "https://i.pravatar.cc/150?u=a042581f4e29026704d", status: "offline" },
-    { name: "Alex W.", img: "https://i.pravatar.cc/150?u=a04258114e29026702d", status: "online" },
-    { name: "Emma S.", img: "https://i.pravatar.cc/150?u=a048581f4e29026701d", status: "online" },
-    { name: "Mike R.", img: "https://i.pravatar.cc/150?u=a042581f4e29026024e", status: "offline" },
-    { name: "Emma S.", img: "https://i.pravatar.cc/150?u=a048581f4e29026701d", status: "online" },
-    { name: "Alex W.", img: "https://i.pravatar.cc/150?u=a04258114e29026702d", status: "online" },
-    { name: "Emma S.", img: "https://i.pravatar.cc/150?u=a048581f4e29026701d", status: "online" },
-    { name: "Mike R.", img: "https://i.pravatar.cc/150?u=a042581f4e29026024e", status: "offline" },
-    { name: "Emma S.", img: "https://i.pravatar.cc/150?u=a048581f4e29026701d", status: "online" },
-    { name: "Mike R.", img: "https://i.pravatar.cc/150?u=a042581f4e29026024e", status: "offline" },
-  ];
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const { globalUser } = useUser();
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await fetch('/api/users');
+        const data = await response.json();
+         const globalUserEmail = globalUser?.email;
+         const filteredContacts = data.filter((contact: Contact) => contact.email !== globalUserEmail);
+         setContacts(filteredContacts);
+        console.log(data);
+      } catch (error) {
+        console.error('Error fetching contacts:', error);
+      }
+    };
+
+    fetchContacts();
+  }, []);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -46,13 +60,13 @@ export default function RecentContacts() {
             >
               <Search size={18} />
             </Button>
-            <Button
+            {/* <Button
               isIconOnly
               variant="flat"
               className="bg-default-100"
             >
               <Plus size={18} />
-            </Button>
+            </Button> */}
           </div>
         </div>
         <Divider className='my-2'/>
@@ -78,12 +92,12 @@ export default function RecentContacts() {
               <div key={index} className="flex flex-col items-center gap-2 min-w-fit">
                 <div className="relative p-1">
                   <Avatar
-                    src={contact.img}
+                    src={contact.image}
                     size="lg"
-                    className="w-16 h-16 cursor-pointer hover:ring-2 ring-primary transition-all"
+                    className="w-16 h-16 cursor-pointer hover:ring-2 ring-success transition-all"
                   />
                   <div className={`absolute bottom-1 right-1 w-3 h-3 rounded-full border-2 border-white ${
-                    contact.status === 'online' ? 'bg-success' : 'bg-default-300'
+                    contact.status === 'online' ? 'bg-success' : 'bg-default'
                   }`} />
                 </div>
                 <span className="text-sm font-medium">{contact.name}</span>

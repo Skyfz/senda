@@ -5,12 +5,32 @@ import { useUser } from "@/context/user-context"
 import { Card, CardBody, Input, Button } from "@nextui-org/react"
 import { useRouter } from 'next/navigation'
 import { ArrowDownLeft, Wallet, DollarSign } from 'lucide-react'
+import { useEffect } from 'react'
 
 export default function WithdrawPage() {
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const { globalUser } = useUser()
   const router = useRouter()
+  const [availability, setAvailability] = useState(null)
+
+  // Fetch availability on component mount
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      try {
+        const response = await fetch('/api/ozow/payout/availability');
+        if (!response.ok) {
+          throw new Error('Failed to fetch availability');
+        }
+        const data = await response.json();
+        setAvailability(data);
+      } catch (error) {
+        console.error('Error fetching availability:', error);
+      }
+    };
+
+    fetchAvailability();
+  }, []);
 
   const handleWithdraw = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
@@ -91,6 +111,21 @@ export default function WithdrawPage() {
                   {loading ? "Processing..." : "Confirm Withdrawal"}
                 </Button>
               </div>
+            </CardBody>
+          </Card>
+        </div>
+
+        <div className="pt-2 pb-4">
+          <Card className="mt-6 bg-opacity-50">
+            <CardBody className="py-5 px-4">
+              {/* Display availability data */}
+              {availability && (
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Availability</h3>
+                  <p>{JSON.stringify(availability)}</p>
+                </div>
+              )}
+              {/* ... existing withdrawal form ... */}
             </CardBody>
           </Card>
         </div>

@@ -4,30 +4,32 @@ import { MongoClient } from 'mongodb';
 
 interface User {
   email: string;
-  // Add other user properties here
 }
 
-export async function GET(request: Request) {
+export async function GET(req: Request) {
   try {
-    const client: MongoClient = await clientPromise;
-    const db = client.db('test');
+    const client = await clientPromise;
+    const db = client.db("test");
+
+    // Fetch users from the 'users' collection
+    const users = await db.collection("users").find({}).toArray();
     
-    const users = await db.collection<User>('users')
-      .find({})
-      .toArray();
-    
-    if (!users || users.length === 0) {
-      return NextResponse.json(
-        { error: 'No users found' },
-        { status: 404 }
-      );
-    }
-    
-    return NextResponse.json(users);
+    // Map through users to add initials fallback for missing images
+    const formattedUsers = users.map(user => {
+      const { name, image } = user;
+      const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
+      return {
+        ...user,
+        image: image || `https://via.placeholder.com/150?text=${initials}`, // Fallback to initials
+        status : 'online'
+      };
+    });
+
+    return NextResponse.json(formattedUsers);
   } catch (error) {
-    console.error('Error in GET /api/users:', error);
+    console.error('Error fetching users:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch users' },
+      { error: "Failed to fetch users" },
       { status: 500 }
     );
   }
