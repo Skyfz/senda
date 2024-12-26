@@ -49,8 +49,8 @@ export default function SendPage() {
             return <p>No contacts found.</p>;
         }
         return filteredContacts.map((contact: Contact) => (
-            <div className="flex flex-col">
-                <div key={contact.email} className="flex items-center justify-between p-4 border-1">
+            <div key={contact.email} className="flex flex-col">
+                <div className="flex items-center justify-between p-4 border-1">
                     <div className="flex items-center">
                         {contact.image && <img src={contact.image} alt={contact.name} className="w-10 h-10 rounded-full mr-3" />}
                         <div>
