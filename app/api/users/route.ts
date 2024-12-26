@@ -14,14 +14,20 @@ export async function GET(req: Request) {
     // Fetch users from the 'users' collection
     const users = await db.collection("users").find({}).toArray();
     
+    // Function to generate initials image as a data URL
+    const generateInitialsImage = (name: string) => {
+      const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
+      // Return a placeholder URL since we can't use canvas in Node.js environment
+      return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=random`;
+    };
+
     // Map through users to add initials fallback for missing images
     const formattedUsers = users.map(user => {
       const { name, image } = user;
-      const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
       return {
         ...user,
-        image: image || `https://via.placeholder.com/150?text=${initials}`, // Fallback to initials
-        status : 'online'
+        image: image || generateInitialsImage(name), // Use initials image if no image
+        status: 'online'
       };
     });
 
