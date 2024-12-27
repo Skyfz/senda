@@ -1,12 +1,11 @@
 "use client";
 
-import { Search, X, MoreHorizontal, MoreVertical, Divide } from "lucide-react";
-import { Button, Card, CardBody, Divider, Input, Listbox, ListboxItem, Popover, PopoverTrigger, PopoverContent, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton } from "@nextui-org/react";
+
+import { Search,MoreVertical,ChevronLeft, ChevronRight  } from "lucide-react";
+import { Button, Card, CardBody, Avatar, Input, Listbox, ListboxItem, Popover, PopoverTrigger, PopoverContent, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton,ScrollShadow, } from "@nextui-org/react";
 import { Kbd } from "@nextui-org/kbd";
-import { useEffect, useState, ReactNode } from "react";
 import { useUser } from '@/context/user-context';
-import RecentContacts from "@/components/RecentContacts";
-import React from "react";
+import React, { useRef, useEffect, useState, ReactNode } from 'react';
 
 interface Contact {
     email: string; // Add other properties as needed
@@ -31,6 +30,7 @@ export default function SendPage() {
     const [selectedContactName, setSelectedContactName] = useState<string>("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [openPopoverEmail, setOpenPopoverEmail] = useState<string | null>(null);
 
     useEffect(() => {
@@ -72,12 +72,25 @@ export default function SendPage() {
         onClose();
     };
 
+    
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
+
     const renderContacts = () => {
         if (loading) {
             return (
                 <div className="space-y-2">
                     {[...Array(3)].map((_, index) => (
-                        <div key={index} className="flex items-center p-4 bg-gradient-to-tl from-default rounded-lg">
+                        <div key={index} className="flex items-center p-4 bg-default-100 rounded-lg">
                             <Skeleton className="w-10 h-10 rounded-full mr-3" />
                             <div className="flex-1">
                                 <Skeleton className="h-4 mb-2 w-60" />
@@ -92,8 +105,8 @@ export default function SendPage() {
             return <p>No contacts found.</p>;
         }
         return filteredContacts.map((contact: Contact) => (
-            <div key={contact.email} className="flex flex-col">
-                <div className="flex items-center justify-between p-4 bg-gradient-to-tl from-default rounded-lg">
+            <div key={contact.email} className="flex flex-col cursor-pointer">
+                <div className="flex items-center justify-between p-4 bg-default-100 rounded-lg">
                     <div className="flex items-center">
                         <img 
                             src={contact.image || '/path/to/default/image.png'}
@@ -102,13 +115,13 @@ export default function SendPage() {
                         />
                         <div>
                             <div className="font-semibold">{contact.name}</div>
-                            <div className="text-default-300">{contact.bio || "No bio available"}</div>
+                            <div className="text-default-400">{contact.bio || "No bio available"}</div>
                         </div>
                     </div>
                     <div className="flex space-x-2">
                         <Popover isOpen={openPopoverEmail === contact.email} onOpenChange={(isOpen) => {
                             setOpenPopoverEmail(isOpen ? contact.email : null);
-                        }} showArrow backdrop={"blur"} offset={6} placement="left">
+                        }} showArrow={true} backdrop={"blur"} offset={6} placement="left">
                             <PopoverTrigger>
                                 <Button
                                     className="text-foreground w-4"
@@ -121,20 +134,26 @@ export default function SendPage() {
                             </PopoverTrigger>
                             <PopoverContent>
                                 <ListboxWrapper>
-                                    <Listbox aria-label="Actions" className="w-full items-centre justify-center min-w-[160px]">
-                                        <ListboxItem key="view" className="text-center">View Profile</ListboxItem>
-                                        <ListboxItem key="send" className="text-center">Send Money</ListboxItem>
-                                        <ListboxItem key="request" className="text-center">Request Money</ListboxItem>
+                                    <Listbox aria-label="Actions" className="w-full items-centre justify-center min-w-[200px]">
+                                        <ListboxItem key="view" className="text-left py-2">
+                                            <p className="text-medium">View Profile</p>
+                                        </ListboxItem>
+                                        <ListboxItem key="send" className="text-left py-2">
+                                            <p className="text-medium">Send Money</p>
+                                        </ListboxItem>
+                                        <ListboxItem key="request" className="text-left py-2">
+                                            <p className="text-medium">Request Money</p>
+                                        </ListboxItem>
                                         <ListboxItem 
                                             key="delete" 
-                                            className="text-danger text-center" 
+                                            className="text-danger text-left py-2" 
                                             color="danger"
                                             onClick={() => {
                                                 handleDeleteContact(contact.name);
                                                 setOpenPopoverEmail(null);
                                             }}
                                         >
-                                            Delete Contact
+                                            <p className="text-medium">Delete Contact</p>
                                         </ListboxItem>
                                     </Listbox>
                                 </ListboxWrapper>
@@ -149,10 +168,11 @@ export default function SendPage() {
     const renderRecentContacts = () => {
         if (loading) {
             return (
-                <div className="flex overflow-x-auto space-x-4 m-4">
-                    {[...Array(3)].map((_, index) => (
-                        <div key={index} className="flex flex-row">
-                            <Skeleton className="w-14 h-14 rounded-full" />
+                <div className="flex overflow-x-auto space-x-6 m-6">
+                    {[...Array(5)].map((_, index) => (
+                        <div key={index} className="flex flex-col space-y-2">
+                            <Skeleton className="w-16 h-16 rounded-full" />
+                            <Skeleton className="w-16 h-3" />
                         </div>
                     ))}
                 </div>
@@ -162,14 +182,51 @@ export default function SendPage() {
             return <p>No contacts found.</p>;
         }
         return (
-            <div className="flex overflow-x-auto space-x-4 m-4">
-                {filteredContacts.map((contact: Contact) => (
-                    <div key={contact.email} className="flex flex-row">
-                        {contact.image && <img src={contact.image} alt={contact.name} className="w-14 h-14 rounded-full" />}
-                    </div>
-                    
-                ))}
-            </div>
+            <div className="relative">
+          <Button
+            isIconOnly
+            variant="flat"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-default-100 hidden md:flex"
+            size="sm"
+            onClick={scrollLeft}
+          >
+            <ChevronLeft size={18} />
+          </Button>
+
+          <ScrollShadow 
+            ref={scrollContainerRef}
+            className="flex gap-6 py-2 overflow-x-scroll px-8 md:px-12" 
+            orientation="horizontal"
+            hideScrollBar
+          >
+            {contacts.map((contact, index) => (
+              <div key={index} className="flex flex-col items-center gap-2 min-w-fit">
+                <div className="relative p-1">
+                  <Avatar
+                    src={contact.image}
+                    size="lg"
+                    className="w-16 h-16 cursor-pointer hover:ring-2 ring-success transition-all"
+                  />
+                  <div className={`absolute bottom-1 right-1 w-3 h-3 rounded-full border-2 border-white ${
+                    contact.status === 'online' ? 'bg-success' : 'bg-default'
+                  }`} />
+                </div>
+                <span className="text-sm font-medium">
+                  {contact.name.split(' ')[0]} {contact.name.split(' ')[1]?.[0]}.
+                </span>
+              </div>
+            ))}
+          </ScrollShadow>
+          <Button
+            isIconOnly
+            variant="flat"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-default-100 hidden md:flex"
+            size="sm"
+            onClick={scrollRight}
+          >
+            <ChevronRight size={18} />
+          </Button>
+        </div>
         );
     };
 

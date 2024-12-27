@@ -100,7 +100,9 @@ export default function RecentContacts() {
                     contact.status === 'online' ? 'bg-success' : 'bg-default'
                   }`} />
                 </div>
-                <span className="text-sm font-medium">{contact.name}</span>
+                <span className="text-sm font-medium">
+                  {contact.name.split(' ')[0]} {contact.name.split(' ')[1]?.[0]}.
+                </span>
               </div>
             ))}
           </ScrollShadow>
