@@ -1,8 +1,8 @@
 "use client";
 
 
-import { Search,MoreVertical,ChevronLeft, ChevronRight  } from "lucide-react";
-import { Button, Card, CardBody, Avatar, Input, Listbox, ListboxItem, Popover, PopoverTrigger, PopoverContent, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton,ScrollShadow, } from "@nextui-org/react";
+import { Search,MoreVertical,ChevronLeft, ChevronRight, Wallet } from "lucide-react";
+import { Button, Card, CardBody, Avatar, Input, Listbox, ListboxItem, Popover, PopoverTrigger, PopoverContent, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton,ScrollShadow, Divider } from "@nextui-org/react";
 import { Kbd } from "@nextui-org/kbd";
 import { useUser } from '@/context/user-context';
 import React, { useRef, useEffect, useState, ReactNode } from 'react';
@@ -21,6 +21,23 @@ const ListboxWrapper = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
+const TRANSACTION_FEE_PERCENTAGE = 1; // 1%
+const MINIMUM_FEE = 1; // R1 minimum fee
+const MINIMUM_SEND_AMOUNT = 5; // R5 minimum send
+
+const calculateFees = (inputAmount: string) => {
+    const numAmount = Number(inputAmount) || 0;
+    const calculatedFee = numAmount === 0 ? 0 : Math.max(
+        MINIMUM_FEE,
+        (numAmount * TRANSACTION_FEE_PERCENTAGE) / 100
+    );
+    return {
+        amount: numAmount,
+        fee: calculatedFee,
+        total: numAmount + calculatedFee
+    };
+};
+
 export default function SendPage() {
     const { globalUser } = useUser();
     const [contacts, setContacts] = useState<Contact[]>([]);
@@ -32,6 +49,10 @@ export default function SendPage() {
     const [error, setError] = useState<string | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [openPopoverEmail, setOpenPopoverEmail] = useState<string | null>(null);
+    const [step, setStep] = useState<number>(1);
+    const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+    const [amount, setAmount] = useState<string>("");
+    const [amountError, setAmountError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchContacts = async () => {
@@ -85,6 +106,11 @@ export default function SendPage() {
     }
   };
 
+    const handleContactSelect = (contact: Contact) => {
+        setSelectedContact(contact);
+        setStep(2);
+    };
+
     const renderContacts = () => {
         if (loading) {
             return (
@@ -105,7 +131,11 @@ export default function SendPage() {
             return <p>No contacts found.</p>;
         }
         return filteredContacts.map((contact: Contact) => (
-            <div key={contact.email} className="flex flex-col cursor-pointer">
+            <div 
+                key={contact.email} 
+                className="flex flex-col cursor-pointer"
+                onClick={() => handleContactSelect(contact)}
+            >
                 <div className="flex items-center justify-between p-4 bg-default-100 rounded-lg">
                     <div className="flex items-center">
                         <img 
@@ -200,7 +230,11 @@ export default function SendPage() {
             hideScrollBar
           >
             {contacts.map((contact, index) => (
-              <div key={index} className="flex flex-col items-center gap-2 min-w-fit">
+              <div 
+                key={index} 
+                className="flex flex-col items-center gap-2 min-w-fit"
+                onClick={() => handleContactSelect(contact)}
+              >
                 <div className="relative p-1">
                   <Avatar
                     src={contact.image}
@@ -252,12 +286,11 @@ export default function SendPage() {
         />
     );
 
-    return (
-        <section className="flex flex-col w-full items-center justify-center">
-            <div className="min-h-screen w-full max-w-2xl">
-            <div className="">
-                <Card isBlurred className="min-h-[640px]">
-                    <CardBody>
+    const renderStep = () => {
+        switch(step) {
+            case 1:
+                return (
+                    <>
                         <h1 className="text-3xl font-bold my-6 mx-2">Send Money</h1>
                         <div className="mx-2">{searchInput}</div>
                         <div className="mt-2 space-y-2">
@@ -284,9 +317,200 @@ export default function SendPage() {
                                 </ModalFooter>
                             </ModalContent>
                         </Modal>
-                        {/* <RecentContacts /> */}
-                    </CardBody>
-                </Card>
+                    </>
+                );
+            
+            case 2:
+                const calculations = calculateFees(amount);
+                
+                const validateAmount = (value: string) => {
+                    const numAmount = Number(value);
+                    if (!value) {
+                        setAmountError("Please enter an amount");
+                        return false;
+                    }
+                    if (numAmount < MINIMUM_SEND_AMOUNT) {
+                        setAmountError(`Minimum amount is R${MINIMUM_SEND_AMOUNT.toFixed(2)}`);
+                        return false;
+                    }
+                    setAmountError(null);
+                    return true;
+                };
+
+                return (
+                    <div className="p-4">
+                        <div className="flex items-center mb-6">
+                            <Button
+                                isIconOnly
+                                variant="light"
+                                onClick={() => setStep(1)}
+                                className="mr-4"
+                            >
+                                <ChevronLeft />
+                            </Button>
+                            <h1 className="text-3xl font-bold">Enter Amount</h1>
+                        </div>
+
+                        {selectedContact && (
+                            <div className="flex items-center py-4 mb-6">
+                                <img 
+                                    src={selectedContact.image || '/path/to/default/image.png'}
+                                    alt={selectedContact.name} 
+                                    className="w-12 h-12 rounded-full mr-4" 
+                                />
+                                <div>
+                                    <div className="font-semibold text-lg">{selectedContact.name}</div>
+                                    <div className="text-default-500">{selectedContact.email}</div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 px-2">
+                                <Wallet className="w-5 h-5 text-default-500" />
+                                <span className="text-sm font-medium">Amount to Send</span>
+                            </div>
+                            
+                            <Input
+                                size="lg"
+                                color={amountError ? "danger" : "success"}
+                                type="number"
+                                placeholder="Enter amount"
+                                value={amount}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                        setAmount(value);
+                                        validateAmount(value);
+                                    }
+                                }}
+                                variant="bordered"
+                                startContent={
+                                    <p className="text-default-400 pointer-events-none flex flex-col justify-center font-bold text-md">R</p>
+                                }
+                                className="w-full"
+                                errorMessage={amountError}
+                                isInvalid={!!amountError}
+                            />
+
+                            {/* Fee Breakdown Card */}
+                            <Card isBlurred>
+                                <CardBody className="gap-2">
+                                    <div className="flex justify-between text-small">
+                                        <span className="text-default-500">Amount:</span>
+                                        <span>R {calculations.amount.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-small">
+                                        <span className="text-default-500">Service Fee ({TRANSACTION_FEE_PERCENTAGE}%):</span>
+                                        <span>R {calculations.fee.toFixed(2)}</span>
+                                    </div>
+                                    <Divider className="my-2"/>
+                                    <div className="flex justify-between font-medium">
+                                        <span>Total:</span>
+                                        <span>R {calculations.total.toFixed(2)}</span>
+                                    </div>
+                                    <div className="text-tiny text-default-400 mt-2">
+                                        *Minimum send amount of R{MINIMUM_SEND_AMOUNT.toFixed(2)} applies<br/>
+                                        *Minimum fee of R{MINIMUM_FEE.toFixed(2)} applies<br/>
+                                        *Fees are non-refundable
+                                    </div>
+                                </CardBody>
+                            </Card>
+
+                            <Button 
+                                className="w-full"
+                                color="success"
+                                size="lg"
+                                onClick={() => {
+                                    if (validateAmount(amount)) {
+                                        setStep(3);
+                                    }
+                                }}
+                            >
+                                Continue
+                            </Button>
+                        </div>
+                    </div>
+                );
+            
+            case 3:
+                const confirmationCalculations = calculateFees(amount);
+                return (
+                    <div className="p-4">
+                        <div className="flex items-center mb-6">
+                            <Button
+                                isIconOnly
+                                variant="light"
+                                onClick={() => setStep(2)}
+                                className="mr-4"
+                            >
+                                <ChevronLeft />
+                            </Button>
+                            <h1 className="text-3xl font-bold">Confirm Transaction</h1>
+                        </div>
+
+                        {selectedContact && (
+                            <div className="space-y-6">
+                                <div className="font-semibold text-md text-default-500">Sending&nbsp;To:</div>
+                                <div className="flex items-center b-6">
+                                    <img 
+                                        src={selectedContact.image || '/path/to/default/image.png'}
+                                        alt={selectedContact.name} 
+                                        className="w-12 h-12 rounded-full mr-4" 
+                                    />
+                                    <div>
+                                        <div className="font-semibold text-lg">{selectedContact.name}</div>
+                                        <div className="text-default-500">{selectedContact.email}</div>
+                                    </div>
+                                </div>
+
+                                    <Divider className="my-4"/>
+
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between text-md">
+                                            <span className="text-default-500">Amount:</span>
+                                            <span className="font-semibold">R {confirmationCalculations.amount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-md">
+                                            <span className="text-default-500">Service Fee ({TRANSACTION_FEE_PERCENTAGE}%):</span>
+                                            <span className="font-semibold">R {confirmationCalculations.fee.toFixed(2)}</span>
+                                        </div>
+                                        <Divider className="my-4"/>
+                                        <div className="flex justify-between text-lg font-bold">
+                                            <span>Total:</span>
+                                            <span>R {confirmationCalculations.total.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                        )}
+
+                        <div className="flex my-4">
+                            <Button 
+                                className="flex-1"
+                                color="success"
+                                size="lg"
+                                onClick={() => {
+                                    // Handle transaction submission here
+                                    console.log("Transaction confirmed");
+                                }}
+                            >
+                                Confirm & Pay
+                            </Button>
+                        </div>
+                    </div>
+                );
+        }
+    };
+
+    return (
+        <section className="flex flex-col w-full items-center justify-center">
+            <div className="min-h-screen w-full max-w-2xl">
+                <div className="">
+                    <Card isBlurred className="min-h-[640px]">
+                        <CardBody>
+                            {renderStep()}
+                        </CardBody>
+                    </Card>
                 </div>
             </div>
         </section>
