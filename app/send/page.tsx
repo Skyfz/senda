@@ -62,8 +62,9 @@ export default function SendPage() {
                     throw new Error('Failed to fetch users');
                 }
                 const data = await response.json();
-                const globalUserEmail = globalUser?.email;
-                const filteredContacts = data.filter((contact: Contact) => contact.email !== globalUserEmail);
+                const filteredContacts = data.filter((contact: Contact) => 
+                    contact.email !== globalUser?.email
+                );
                 setContacts(filteredContacts);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An error occurred');
@@ -72,7 +73,9 @@ export default function SendPage() {
             }
         };
 
-        fetchContacts();
+        if (globalUser?.email) {
+            fetchContacts();
+        }
     }, [globalUser]);
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,7 +83,8 @@ export default function SendPage() {
     };
 
     const filteredContacts = contacts.filter(contact =>
-        contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+        contact.name.toLowerCase().includes(searchTerm.toLowerCase()) && 
+        contact.email !== globalUser?.email
     );
 
     const handleDeleteContact = (contactName: string) => {
