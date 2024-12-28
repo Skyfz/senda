@@ -21,7 +21,7 @@ export default function SendSuccessPage() {
       const amount = searchParams.get('amount');
       const recipient = searchParams.get('recipient');
 
-      console.log('Search Params:', { transactionId, amount, recipient });
+    //   console.log('Search Params:', { transactionId, amount, recipient });
       
       if (!transactionId || !amount || !recipient) {
         console.log('Missing required parameters:', { transactionId, amount, recipient });
