@@ -4,7 +4,9 @@ import { Button } from "@nextui-org/button";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Card, CardBody, Divider, Spinner } from "@nextui-org/react";
-import { CheckCircle2, Copy, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Copy, AlertCircle, SearchSlashIcon } from 'lucide-react';
+import { SearchParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
+import { log } from "console";
 
 interface SuccessPageProps {
   searchParams: {
@@ -24,6 +26,7 @@ export default function SendSuccessPage({ searchParams }: SuccessPageProps) {
   useEffect(() => {
     const fetchTransactionDetails = async () => {
       if (!searchParams.transactionId) {
+        console.log(searchParams);
         setError('Invalid transaction parameters');
         setLoading(false);
         return;
