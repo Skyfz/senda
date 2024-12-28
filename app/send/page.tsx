@@ -458,16 +458,16 @@ export default function SendPage() {
                             <Card isBlurred>
                                 <CardBody className="gap-2">
                                     <div className="flex justify-between text-small">
-                                        <span className="text-default-500">Amount:</span>
+                                        <span className="text-default-500">Amount</span>
                                         <span>R {calculations.amount.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-small">
-                                        <span className="text-default-500">Service Fee ({TRANSACTION_FEE_PERCENTAGE}%):</span>
+                                        <span className="text-default-500">Service Fee ({TRANSACTION_FEE_PERCENTAGE}%)</span>
                                         <span>R {calculations.fee.toFixed(2)}</span>
                                     </div>
                                     <Divider className="my-2"/>
                                     <div className="flex justify-between font-medium">
-                                        <span>Total:</span>
+                                        <span>Total</span>
                                         <span>R {calculations.total.toFixed(2)}</span>
                                     </div>
                                     <div className="text-tiny text-default-400 mt-2">
@@ -539,7 +539,7 @@ export default function SendPage() {
                                     {/* Add Payment Method Selection */}
                                     <Card isBlurred className="">
                                         <CardBody className="">
-                                            <h3 className="text-md font-semibold text-default-500 my-2">Payment Method</h3>
+                                            <h3 className="text-md font-semibold text-default-500 mt-2">Payment Method</h3>
                                             <div className="flex items-center justify-between p-2 border rounded-lg my-4">
                                                 <div className="flex items-center gap-3">
                                                     <Wallet className="text-foreground" />
@@ -551,23 +551,23 @@ export default function SendPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center">
-                                                    <div className="w-4 h-4 rounded-full border-2 border-success bg-success"></div>
+                                                    <div className="w-4 h-4 rounded-full border-2 border-defualt bg-success"></div>
                                                 </div>
                                             </div>
-                                            <div className="space-y-3 py-2">
-                                                <div className="flex justify-between text-md">
-                                                    <span className="text-default-500">Amount:</span>
-                                                    <span className="font-semibold">R {confirmationCalculations.amount.toFixed(2)}</span>
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between text-small pt-1">
+                                                    <span className="text-default-500">Amount</span>
+                                                    <span>R {confirmationCalculations.amount.toFixed(2)}</span>
                                                 </div>
-                                                <div className="flex justify-between text-md">
-                                                    <span className="text-default-500">Service Fee ({TRANSACTION_FEE_PERCENTAGE}%):</span>
-                                                    <span className="font-semibold">R {confirmationCalculations.fee.toFixed(2)}</span>
+                                                <div className="flex justify-between text-small py-1">
+                                                    <span className="text-default-500">Service Fee ({TRANSACTION_FEE_PERCENTAGE}%)</span>
+                                                    <span>R {confirmationCalculations.fee.toFixed(2)}</span>
                                                 </div>
-                                            </div>
-                                            <Divider className="my-2"/>
-                                            <div className="flex justify-between text-lg font-bold my-2">
-                                                <span>Total:</span>
-                                                <span>R {confirmationCalculations.total.toFixed(2)}</span>
+                                                <Divider className=""/>
+                                                <div className="flex justify-between font-medium py-2">
+                                                    <span>Total</span>
+                                                    <span>R {confirmationCalculations.total.toFixed(2)}</span>
+                                                </div>
                                             </div>
                                         </CardBody>
                                     </Card>
