@@ -458,7 +458,6 @@ export default function SendPage() {
                             </Card>
 
                             <Textarea
-                                isClearable
                                 label="Note (optional)"
                                 placeholder="Enter a message for this transaction"
                                 className="w-full mt-4"
@@ -466,8 +465,6 @@ export default function SendPage() {
                                 onChange={(e) => setTransactionNote(e.target.value)}
                                 maxLength={100}
                                 maxRows={3}
-                                // eslint-disable-next-line no-console
-                                onClear={() => console.log("textarea cleared")}
                             />
 
                             <Button 
