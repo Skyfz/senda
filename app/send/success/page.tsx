@@ -1,23 +1,15 @@
 'use client'
 
 import { Button } from "@nextui-org/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Card, CardBody, Divider, Spinner } from "@nextui-org/react";
 import { CheckCircle2, Copy, AlertCircle, SearchSlashIcon } from 'lucide-react';
 import { SearchParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 
-
-interface SuccessPageProps {
-  searchParams: {
-    transactionId?: string;
-    amount?: string;
-    recipient?: string;
-  };
-}
-
-export default function SendSuccessPage({ searchParams }: SuccessPageProps) {
+export default function SendSuccessPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [transactionDetails, setTransactionDetails] = useState<any>(null);
@@ -25,21 +17,21 @@ export default function SendSuccessPage({ searchParams }: SuccessPageProps) {
 
   useEffect(() => {
     const fetchTransactionDetails = async () => {
-      console.log('Search Params:', JSON.stringify(searchParams));
+      const transactionId = searchParams.get('transactionId');
+      const amount = searchParams.get('amount');
+      const recipient = searchParams.get('recipient');
+
+      console.log('Search Params:', { transactionId, amount, recipient });
       
-      if (!searchParams?.transactionId || !searchParams?.amount || !searchParams?.recipient) {
-        console.log('Missing required parameters:', {
-          transactionId: searchParams?.transactionId,
-          amount: searchParams?.amount,
-          recipient: searchParams?.recipient
-        });
+      if (!transactionId || !amount || !recipient) {
+        console.log('Missing required parameters:', { transactionId, amount, recipient });
         setError('Missing transaction parameters. Please try sending money again.');
         setLoading(false);
         return;
       }
 
       try {
-        const response = await fetch(`/api/transactions/${searchParams.transactionId}`);
+        const response = await fetch(`/api/transactions/${transactionId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch transaction details');
         }
@@ -80,7 +72,7 @@ export default function SendSuccessPage({ searchParams }: SuccessPageProps) {
     };
 
     fetchTransactionDetails();
-  }, [searchParams.transactionId]);
+  }, [searchParams]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -126,7 +118,7 @@ export default function SendSuccessPage({ searchParams }: SuccessPageProps) {
                   <div>
                     <h2 className="text-lg font-semibold pb-1 text-center">Money Sent Successfully</h2>
                     <p className="text-sm text-default-500 text-center">
-                      Your payment has been sent to {searchParams.recipient}
+                      Your payment has been sent to {searchParams.get('recipient')}
                     </p>
                   </div>
                 </div>
@@ -134,7 +126,7 @@ export default function SendSuccessPage({ searchParams }: SuccessPageProps) {
                 <div className="space-y-6">
                   <div className="flex justify-between items-center text-small pt-4">
                     <span className="text-default-500">Amount Sent</span>
-                    <span className="text-4xl font-semibold">R {searchParams.amount}</span>
+                    <span className="text-4xl font-semibold">R {searchParams.get('amount')}</span>
                   </div>
                   
                   <Divider className="my-4" />
@@ -155,13 +147,13 @@ export default function SendSuccessPage({ searchParams }: SuccessPageProps) {
                   <div className="flex justify-between items-center text-small">
                     <span className="text-default-500">Transaction ID</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-right">{searchParams.transactionId}</span>
+                      <span className="text-sm font-medium text-right">{searchParams.get('transactionId')}</span>
                       <Button
                         isIconOnly
                         size="sm"
                         variant="flat"
                         className="bg-default-100 hover:bg-default-200"
-                        onClick={() => copyToClipboard(searchParams.transactionId || '')}
+                        onClick={() => copyToClipboard(searchParams.get('transactionId') || '')}
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
