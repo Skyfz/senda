@@ -159,7 +159,17 @@ export default function SendPage() {
                             <div className="text-default-400">{contact.bio || "No bio available"}</div>
                         </div>
                     </div>
-                    <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                    <div 
+                        role="button"
+                        tabIndex={0}
+                        className="flex space-x-2" 
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation();
+                            }
+                        }}
+                    >
                         <Popover 
                             isOpen={openPopoverEmail === contact.email} 
                             onOpenChange={(isOpen) => {
