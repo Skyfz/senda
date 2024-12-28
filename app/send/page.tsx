@@ -2,12 +2,13 @@
 
 
 import { Search,MoreVertical,ChevronLeft, ChevronRight, Wallet } from "lucide-react";
-import { Button, Card, CardBody, Avatar, Input, Listbox, ListboxItem, Popover, PopoverTrigger, PopoverContent, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton,ScrollShadow, Divider } from "@nextui-org/react";
+import { Button, Card, CardBody, Avatar, Input, Listbox, ListboxItem, Popover, PopoverTrigger, PopoverContent, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Skeleton,ScrollShadow, Divider, Textarea } from "@nextui-org/react";
 import { Kbd } from "@nextui-org/kbd";
 import { useUser } from '@/context/user-context';
 import React, { useRef, useEffect, useState, ReactNode } from 'react';
 
 interface Contact {
+    _id:    string;
     email: string; // Add other properties as needed
     name: string;
     image?: string; // Optional if it can be undefined
@@ -53,6 +54,7 @@ export default function SendPage() {
     const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
     const [amount, setAmount] = useState<string>("");
     const [amountError, setAmountError] = useState<string | null>(null);
+    const [transactionNote, setTransactionNote] = useState<string>("");
 
     useEffect(() => {
         const fetchContacts = async () => {
@@ -455,6 +457,16 @@ export default function SendPage() {
                                 </CardBody>
                             </Card>
 
+                            <Textarea
+                                label="Note (optional)"
+                                placeholder="Enter a message for this transaction"
+                                className="w-full mt-4"
+                                value={transactionNote}
+                                onChange={(e) => setTransactionNote(e.target.value)}
+                                maxLength={100}
+                                maxRows={3}
+                            />
+
                             <Button 
                                 className="w-full"
                                 color="success"
@@ -529,7 +541,18 @@ export default function SendPage() {
                                 size="lg"
                                 onClick={() => {
                                     // Handle transaction submission here
-                                    console.log("Transaction confirmed");
+                                    console.log({
+                                        transactionId: Math.random().toString(36).substr(2, 9), // Demo ID
+                                        senderId: globalUser?._id,
+                                        senderEmail: globalUser?.email,
+                                        recipientId: selectedContact?._id,
+                                        recipientEmail: selectedContact?.email,
+                                        amount: confirmationCalculations.amount,
+                                        fee: confirmationCalculations.fee,
+                                        total: confirmationCalculations.total,
+                                        note: transactionNote,
+                                        timestamp: new Date().toISOString()
+                                    });
                                 }}
                             >
                                 Confirm & Pay
