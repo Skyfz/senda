@@ -25,7 +25,7 @@ export default function BalanceCard() {
     globalUser?._id ? `/api/wallet/balance?userId=${globalUser._id}` : null,
     fetcher,
     {
-      refreshInterval: 1000,
+      refreshInterval: 10000,
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
       revalidateOnMount: true
@@ -79,7 +79,7 @@ export default function BalanceCard() {
           {isLoading ? (
             <Skeleton className="h-10 w-52 rounded-full bg-white/20"/>
           ) : (
-            <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
+            <h1 className="text-5xl font-bold tracking-tight text-white md:text-5xl">
               {showBalance ? formattedBalance : "--- -- ---"}
             </h1>
           )}
