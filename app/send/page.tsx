@@ -135,6 +135,13 @@ export default function SendPage() {
                 key={contact.email} 
                 className="flex flex-col cursor-pointer"
                 onClick={() => handleContactSelect(contact)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        handleContactSelect(contact);
+                    }
+                }}
             >
                 <div className="flex items-center justify-between p-4 bg-default-100 rounded-lg">
                     <div className="flex items-center">
@@ -234,6 +241,13 @@ export default function SendPage() {
                 key={index} 
                 className="flex flex-col items-center gap-2 min-w-fit"
                 onClick={() => handleContactSelect(contact)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        handleContactSelect(contact);
+                    }
+                }}
               >
                 <div className="relative p-1">
                   <Avatar
