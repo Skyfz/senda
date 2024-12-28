@@ -522,7 +522,7 @@ export default function SendPage() {
                         </div>
 
                         {selectedContact && (
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <div className="font-semibold text-md text-default-500">Sending&nbsp;To:</div>
                                 <div className="flex items-center b-6">
                                     <img 
@@ -536,12 +536,10 @@ export default function SendPage() {
                                     </div>
                                 </div>
 
-                                    <Divider className="my-4"/>
-
                                     {/* Add Payment Method Selection */}
                                     <Card isBlurred className="">
                                         <CardBody className="">
-                                            <h3 className="text-md font-semibold text-default-500 mb-2 -mt-4">Payment Method</h3>
+                                            <h3 className="text-md font-semibold text-default-500 my-2">Payment Method</h3>
                                             <div className="flex items-center justify-between p-2 border rounded-lg my-4">
                                                 <div className="flex items-center gap-3">
                                                     <Wallet className="text-foreground" />
@@ -578,13 +576,14 @@ export default function SendPage() {
                                     {transactionNote && (
                                         <Card isBlurred className="bg-default-50">
                                             <CardBody>
-                                                <h3 className="text-md font-semibold text-default-500 mb-2">Transaction Note</h3>
-                                                <p className="text-md">{transactionNote}</p>
+                                                <h3 className="text-md font-semibold text-default-500 my-2">Transaction Note</h3>
+                                                <Divider className="my-2"/>
+                                                <p className="text-md my-2">{transactionNote}</p>
                                             </CardBody>
                                         </Card>
                                     )}
-                                </div>
-                            )}
+                            </div>
+                        )}
 
                             <div className="flex flex-col gap-2 mt-6">
                                 <Button 
