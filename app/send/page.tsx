@@ -39,6 +39,14 @@ const calculateFees = (inputAmount: string) => {
     };
 };
 
+// Add this type for the API response
+interface SendResponse {
+    success: boolean;
+    message: string;
+    transactionId: string;
+    error?: string;
+}
+
 export default function SendPage() {
     const { globalUser } = useUser();
     const [contacts, setContacts] = useState<Contact[]>([]);
@@ -347,6 +355,43 @@ export default function SendPage() {
         }
     };
 
+    const processTransaction = async (transactionDetails: {
+        transactionId: string;
+        senderId: string;
+        senderEmail: string;
+        recipientId: string;
+        recipientEmail: string;
+        amount: number;
+        fee: number;
+        total: number;
+        note: string;
+        timestamp: string;
+    }) => {
+        try {
+            const response = await fetch('/api/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(transactionDetails),
+            });
+
+            const data: SendResponse = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Transaction failed');
+            }
+
+            // Redirect to success page with transaction details
+            window.location.href = `/send/success?transactionId=${data.transactionId}&amount=${transactionDetails.amount}&recipient=${transactionDetails.recipientEmail}`;
+
+        } catch (error) {
+            setError(error instanceof Error ? error.message : 'Transaction failed');
+            // Optionally reset to step 2 or handle error differently
+            setStep(2);
+        }
+    };
+
     const renderStep = () => {
         switch(step) {
             case 1:
@@ -594,26 +639,33 @@ export default function SendPage() {
                                         const currentBalance = await checkBalance();
                                         if (confirmationCalculations.total > currentBalance) {
                                             setError("Insufficient balance");
-                                            alert(error)
+                                            alert("Insufficient balance");
                                             return;
                                         }
                                         
-                                        // Proceed with transaction
-                                        console.log({
+                                        // Process transaction
+                                        if (!globalUser?._id || !globalUser?.email || !selectedContact?._id || !selectedContact?.email) {
+                                            alert("Missing required information");
+                                            return;
+                                        }
+
+                                        const transactionDetails = {
                                             transactionId: Math.random().toString(36).substr(2, 9),
-                                            senderId: globalUser?._id,
-                                            senderEmail: globalUser?.email,
-                                            recipientId: selectedContact?._id,
-                                            recipientEmail: selectedContact?.email,
+                                            senderId: globalUser._id,
+                                            senderEmail: globalUser.email,
+                                            recipientId: selectedContact._id,
+                                            recipientEmail: selectedContact.email,
                                             amount: confirmationCalculations.amount,
                                             fee: confirmationCalculations.fee,
                                             total: confirmationCalculations.total,
                                             note: transactionNote,
                                             timestamp: new Date().toISOString()
-                                        });
+                                        };
+
+                                        await processTransaction(transactionDetails);
                                     }}
                                 >
-                                    Confirm & Pay
+                                    Pay
                                 </Button>
                                 <Button 
                                     className="w-full"
@@ -621,7 +673,7 @@ export default function SendPage() {
                                     size="lg"
                                     onClick={() => setStep(2)}
                                 >
-                                    Edit Details
+                                    Edit
                                 </Button>
                             </div>
                         </div>
