@@ -55,6 +55,7 @@ export default function SendPage() {
     const [amount, setAmount] = useState<string>("");
     const [amountError, setAmountError] = useState<string | null>(null);
     const [transactionNote, setTransactionNote] = useState<string>("");
+    const [balance, setBalance] = useState<number>(0);
 
     useEffect(() => {
         const fetchContacts = async () => {
@@ -79,6 +80,14 @@ export default function SendPage() {
             fetchContacts();
         }
     }, [globalUser]);
+
+    useEffect(() => {
+        const fetchBalance = async () => {
+            const result = await checkBalance();
+            setBalance(result);
+        };
+        fetchBalance();
+    }, []);
 
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -326,6 +335,18 @@ export default function SendPage() {
         />
     );
 
+    const checkBalance = async () => {
+        try {
+            const response = await fetch(`/api/wallet/balance?userId=${globalUser?._id}`);
+            if (!response.ok) throw new Error('Failed to fetch balance');
+            const data = await response.json();
+            return data.balance || 0;
+        } catch (error) {
+            console.error('Error checking balance:', error);
+            return 0;
+        }
+    };
+
     const renderStep = () => {
         switch(step) {
             case 1:
@@ -465,6 +486,7 @@ export default function SendPage() {
                                 onChange={(e) => setTransactionNote(e.target.value)}
                                 maxLength={100}
                                 maxRows={3}
+                                variant="bordered"
                             />
 
                             <Button 
@@ -516,49 +538,94 @@ export default function SendPage() {
 
                                     <Divider className="my-4"/>
 
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between text-md">
-                                            <span className="text-default-500">Amount:</span>
-                                            <span className="font-semibold">R {confirmationCalculations.amount.toFixed(2)}</span>
-                                        </div>
-                                        <div className="flex justify-between text-md">
-                                            <span className="text-default-500">Service Fee ({TRANSACTION_FEE_PERCENTAGE}%):</span>
-                                            <span className="font-semibold">R {confirmationCalculations.fee.toFixed(2)}</span>
-                                        </div>
-                                        <Divider className="my-4"/>
-                                        <div className="flex justify-between text-lg font-bold">
-                                            <span>Total:</span>
-                                            <span>R {confirmationCalculations.total.toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                        )}
+                                    {/* Add Payment Method Selection */}
+                                    <Card isBlurred className="">
+                                        <CardBody className="">
+                                            <h3 className="text-md font-semibold text-default-500 mb-2 -mt-4">Payment Method</h3>
+                                            <div className="flex items-center justify-between p-2 border rounded-lg my-4">
+                                                <div className="flex items-center gap-3">
+                                                    <Wallet className="text-foreground" />
+                                                    <div>
+                                                        <p className="font-semibold">Wallet</p>
+                                                        <p className="text-small text-default-500">
+                                                            R {balance.toFixed(2)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <div className="w-4 h-4 rounded-full border-2 border-success bg-success"></div>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-3 py-2">
+                                                <div className="flex justify-between text-md">
+                                                    <span className="text-default-500">Amount:</span>
+                                                    <span className="font-semibold">R {confirmationCalculations.amount.toFixed(2)}</span>
+                                                </div>
+                                                <div className="flex justify-between text-md">
+                                                    <span className="text-default-500">Service Fee ({TRANSACTION_FEE_PERCENTAGE}%):</span>
+                                                    <span className="font-semibold">R {confirmationCalculations.fee.toFixed(2)}</span>
+                                                </div>
+                                            </div>
+                                            <Divider className="my-2"/>
+                                            <div className="flex justify-between text-lg font-bold my-2">
+                                                <span>Total:</span>
+                                                <span>R {confirmationCalculations.total.toFixed(2)}</span>
+                                            </div>
+                                        </CardBody>
+                                    </Card>
 
-                        <div className="flex my-4">
-                            <Button 
-                                className="flex-1"
-                                color="success"
-                                size="lg"
-                                onClick={() => {
-                                    // Handle transaction submission here
-                                    console.log({
-                                        transactionId: Math.random().toString(36).substr(2, 9), // Demo ID
-                                        senderId: globalUser?._id,
-                                        senderEmail: globalUser?.email,
-                                        recipientId: selectedContact?._id,
-                                        recipientEmail: selectedContact?.email,
-                                        amount: confirmationCalculations.amount,
-                                        fee: confirmationCalculations.fee,
-                                        total: confirmationCalculations.total,
-                                        note: transactionNote,
-                                        timestamp: new Date().toISOString()
-                                    });
-                                }}
-                            >
-                                Confirm & Pay
-                            </Button>
+                                    {/* Add Transaction Note Display */}
+                                    {transactionNote && (
+                                        <Card isBlurred className="bg-default-50">
+                                            <CardBody>
+                                                <h3 className="text-md font-semibold text-default-500 mb-2">Transaction Note</h3>
+                                                <p className="text-md">{transactionNote}</p>
+                                            </CardBody>
+                                        </Card>
+                                    )}
+                                </div>
+                            )}
+
+                            <div className="flex flex-col gap-2 mt-6">
+                                <Button 
+                                    className="w-full"
+                                    color="success"
+                                    size="lg"
+                                    onClick={async () => {
+                                        const currentBalance = await checkBalance();
+                                        if (confirmationCalculations.total > currentBalance) {
+                                            setError("Insufficient balance");
+                                            alert(error)
+                                            return;
+                                        }
+                                        
+                                        // Proceed with transaction
+                                        console.log({
+                                            transactionId: Math.random().toString(36).substr(2, 9),
+                                            senderId: globalUser?._id,
+                                            senderEmail: globalUser?.email,
+                                            recipientId: selectedContact?._id,
+                                            recipientEmail: selectedContact?.email,
+                                            amount: confirmationCalculations.amount,
+                                            fee: confirmationCalculations.fee,
+                                            total: confirmationCalculations.total,
+                                            note: transactionNote,
+                                            timestamp: new Date().toISOString()
+                                        });
+                                    }}
+                                >
+                                    Confirm & Pay
+                                </Button>
+                                <Button 
+                                    className="w-full"
+                                    variant="flat"
+                                    size="lg"
+                                    onClick={() => setStep(2)}
+                                >
+                                    Edit Details
+                                </Button>
+                            </div>
                         </div>
-                    </div>
                 );
         }
     };
