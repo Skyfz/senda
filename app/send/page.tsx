@@ -159,21 +159,31 @@ export default function SendPage() {
                             <div className="text-default-400">{contact.bio || "No bio available"}</div>
                         </div>
                     </div>
-                    <div className="flex space-x-2">
-                        <Popover isOpen={openPopoverEmail === contact.email} onOpenChange={(isOpen) => {
-                            setOpenPopoverEmail(isOpen ? contact.email : null);
-                        }} showArrow={true} backdrop={"blur"} offset={6} placement="left">
+                    <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                        <Popover 
+                            isOpen={openPopoverEmail === contact.email} 
+                            onOpenChange={(isOpen) => {
+                                setOpenPopoverEmail(isOpen ? contact.email : null);
+                            }} 
+                            showArrow={true} 
+                            backdrop={"blur"} 
+                            offset={6} 
+                            placement="left"
+                        >
                             <PopoverTrigger>
                                 <Button
                                     className="text-foreground w-4"
                                     variant="light"
                                     isIconOnly
-                                    onClick={() => setOpenPopoverEmail(contact.email)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setOpenPopoverEmail(contact.email);
+                                    }}
                                 >
                                     <MoreVertical />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent>
+                            <PopoverContent onClick={(e) => e.stopPropagation()}>
                                 <ListboxWrapper>
                                     <Listbox aria-label="Actions" className="w-full items-centre justify-center min-w-[200px]">
                                         <ListboxItem key="view" className="text-left py-2">
