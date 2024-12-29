@@ -165,7 +165,7 @@ export default function NotificationsPage() {
                 </div>
                 <h3 className="text-lg font-medium">No Notifications Yet</h3>
                 <p className="text-sm text-default-500 max-w-sm">
-                  Start a transaction to begin tracking your activity. You'll receive notifications for deposits, transfers, and other important updates.
+                  Start a transaction to begin tracking your activity. You&apos;ll receive notifications for deposits, transfers, and other important updates.
                 </p>
                 
                 <div className="flex gap-3 mt-4 w-full max-w-sm">
