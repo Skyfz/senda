@@ -17,6 +17,10 @@ interface Notification {
   transaction_type?: string
   to_email?: string
   from_email?: string
+  to_user_id?: string
+  from_user_id?: string
+  from_bank?: string
+  status_message?: string
 }
 
 export default function NotificationsPage() {
@@ -26,14 +30,14 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (!globalUser?._id) {
-        console.log('No user ID available');
+      if (!globalUser?._id || !globalUser?.email) {
+        console.log('No user ID or email available');
         return;
       }
       
       try {
-        console.log('Fetching notifications for user:', globalUser._id);
-        const response = await fetch(`/api/notifications?userId=${globalUser._id}`);
+        console.log('Fetching notifications for user:', globalUser._id, globalUser.email);
+        const response = await fetch(`/api/notifications?userId=${globalUser._id}&email=${globalUser.email}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -48,9 +52,19 @@ export default function NotificationsPage() {
     };
 
     fetchNotifications();
-  }, [globalUser?._id]);
+  }, [globalUser?._id, globalUser?.email]);
 
   const getNotificationTitle = (notification: Notification) => {
+    // Handle deposit transactions
+    if (notification.transaction_type === 'deposit') {
+      return <>
+        Money Deposited
+        <br />
+        <span className="text-default-500">from: {notification.from_bank || notification.from_email}</span>
+      </>;
+    }
+    
+    // Handle transfer transactions
     if (notification.transaction_type === 'transfer') {
       return notification.to_email === globalUser?.email ? 
         <>
@@ -62,20 +76,28 @@ export default function NotificationsPage() {
           Money Sent
           <br />
           <span className="text-default-500">to: {notification.to_email}</span>
-        </>
+        </>;
     }
-    return `Transaction ${notification.Status}`
+    
+    return `Transaction ${notification.Status}`;
   }
 
   const getNotificationIcon = (notification: Notification) => {
+    // Handle deposit transactions
+    if (notification.transaction_type === 'deposit') {
+      return <ArrowDownLeft className="w-6 h-6 text-success" />;
+    }
+    
+    // Handle transfer transactions
     if (notification.transaction_type === 'transfer') {
       return notification.to_email === globalUser?.email ? 
         <ArrowDownLeft className="w-6 h-6 text-success" /> :
-        <ArrowUpRight className="w-6 h-6 text-success" />
+        <ArrowUpRight className="w-6 h-6 text-success" />;
     }
+    
     return notification.Status === 'complete' ? 
       <Check className="w-6 h-6 text-success" /> :
-      <AlertCircle className="w-6 h-6 text-warning" />
+      <AlertCircle className="w-6 h-6 text-warning" />;
   }
 
   const handleDeleteAllNotifications = async () => {
