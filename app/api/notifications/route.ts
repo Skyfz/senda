@@ -17,7 +17,9 @@ export async function GET(request: Request) {
     const notifications = await db.collection('notifications').find({
       $or: [
         { to_user_id: userId },
-        { to_email: email }
+        { to_email: email },
+        { from_user_id: userId },
+        { from_email: email }
       ]
     }).sort({ created_at: -1 }).toArray();
 
