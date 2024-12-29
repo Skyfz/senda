@@ -196,13 +196,13 @@ export async function POST(req: NextRequest) {
       transaction_type: 'deposit',
       // Include user information from transaction
       from_email: notification.BankName || 'Bank Deposit',
-      to_email: transaction.to_email || transaction.from_email || '', // Get email from transaction
-      from_user_id: null, // Bank deposits come from external source
-      to_user_id: transaction.to_user_id || transaction.from_user_id, // Get user ID from transaction
+      to_email: transaction.to_email, // Get email from transaction
+      from_user_id: 'Ozow Deposit', // Bank deposits come from external source
+      to_user_id: transaction.to_user_id, // Get user ID from transaction
       note: `${notification.BankName || 'Bank'} deposit ${notification.StatusMessage ? `- ${notification.StatusMessage}` : ''}`,
       // Bank details
       from_bank: notification.BankName || 'Unknown Bank',
-      from_account: notification.MaskedAccountNumber || 'Unknown Account',
+      from_account: notification.MaskedAccountNumber || 'Ozow Account',
       status_message: notification.StatusMessage || '',
       sub_status: notification.SubStatus || '',
       is_test: notification.IsTest,
