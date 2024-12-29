@@ -18,15 +18,6 @@ export async function POST(req: Request) {
       ozowApiResponse
     } = await req.json()
 
-    // console.log('ref',transactionReference)
-    // console.log('Ozow Transaction ID:', ozowTransactionId)
-    // console.log('Amount:', amount)
-    // console.log('Status:', status)
-    // console.log('Status Message:', statusMessage)
-    // console.log('Is Test:', isTest)
-    // console.log('Hash:', hash)
-    // console.log('Ozow API Response:', ozowApiResponse)
-
     // Find both the transaction and notification
     const transaction = await db.collection("transactions").findOne({
       _id: new ObjectId(transactionReference)
@@ -35,10 +26,6 @@ export async function POST(req: Request) {
     const notification = await db.collection("notifications").findOne({
       TransactionId: ozowTransactionId
     })
-
-    // console.log('Transaction found:', transaction)
-    // console.log('Notification found:', notification)
-    // console.log('Api Response:', ozowApiResponse)
 
     if (!transaction) {
       console.log('Transaction not found:', transactionReference)
@@ -170,8 +157,7 @@ export async function POST(req: Request) {
         failure_reason: statusMessage
       })
     }
-    // console.log(updateData)
-
+  
     // Update transaction status using _id
     await db.collection("transactions").updateOne(
       { _id: new ObjectId(transactionReference) },

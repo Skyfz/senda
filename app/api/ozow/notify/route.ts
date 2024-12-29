@@ -172,11 +172,26 @@ export async function POST(req: NextRequest) {
 
     const currentTime = new Date().toISOString();
 
-    // Add timestamp and store notification
+    // Update notification format to match send notifications
     const notificationWithTimestamp = {
-      ...notification,
+      TransactionId: notification.TransactionId,
+      TransactionReference: notification.TransactionReference,
+      Amount: notification.Amount,
+      Status: notification.Status,
       created_at: currentTime,
-      updated_at: currentTime
+      updated_at: currentTime,
+      transaction_type: 'deposit',
+      // Add UI relevant fields
+      from_bank: notification.BankName || 'Unknown Bank',
+      from_account: notification.MaskedAccountNumber || 'Unknown Account',
+      status_message: notification.StatusMessage || '',
+      sub_status: notification.SubStatus || '',
+      is_test: notification.IsTest,
+      currency: notification.CurrencyCode,
+      smart_indicators: notification.SmartIndicators || '',
+      // Optional user data if available
+      user_id: notification.Optional1 || '', // Assuming Optional1 contains userId
+      user_email: notification.Optional2 || '' // Assuming Optional2 contains email
     };
 
     await db.collection('notifications').insertOne(notificationWithTimestamp);
@@ -212,12 +227,24 @@ export async function POST(req: NextRequest) {
 
     console.log('Transaction update result:', result);
 
-    // Mark notification as processed
+    // Update notification status with processed timestamp and any additional info
     await db.collection('notifications').updateOne(
       { TransactionId: notification.TransactionId },
       { 
         $set: { 
-          processed_at: currentTime
+          Status: status,
+          processed_at: currentTime,
+          status_message: notification.StatusMessage || '',
+          sub_status: notification.SubStatus || '',
+          // Add any status-specific fields
+          ...(status === 'complete' && { completed_at: currentTime }),
+          ...((['cancelled', 'error', 'abandoned'].includes(status)) && {
+            failed_at: currentTime,
+            failure_reason: notification.StatusMessage || notification.SubStatus
+          }),
+          ...((['pendinginvestigation', 'pending'].includes(status)) && {
+            pending_reason: notification.StatusMessage || notification.SubStatus
+          })
         }
       }
     );
