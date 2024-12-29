@@ -176,12 +176,17 @@ export async function POST(req: NextRequest) {
     const notificationWithTimestamp = {
       TransactionId: notification.TransactionId,
       TransactionReference: notification.TransactionReference,
-      Amount: notification.Amount,
-      Status: notification.Status,
+      Amount: notification.Amount, // Convert to number for UI
+      Status: notification.Status.toLowerCase(), // Ensure consistent case
       created_at: currentTime,
       updated_at: currentTime,
       transaction_type: 'deposit',
-      // Add UI relevant fields
+      // Add note field for UI
+      note: `${notification.BankName || 'Bank'} deposit ${notification.StatusMessage ? `- ${notification.StatusMessage}` : ''}`,
+      // Add required email fields for UI
+      to_email: notification.Optional2 || '', // Assuming Optional2 contains email
+      from_email: notification.BankName || 'Bank Deposit',
+      // Other fields...
       from_bank: notification.BankName || 'Unknown Bank',
       from_account: notification.MaskedAccountNumber || 'Unknown Account',
       status_message: notification.StatusMessage || '',
@@ -189,7 +194,6 @@ export async function POST(req: NextRequest) {
       is_test: notification.IsTest,
       currency: notification.CurrencyCode,
       smart_indicators: notification.SmartIndicators || '',
-      // Optional user data if available
       user_id: notification.Optional1 || '', // Assuming Optional1 contains userId
       user_email: notification.Optional2 || '' // Assuming Optional2 contains email
     };
