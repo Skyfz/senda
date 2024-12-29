@@ -109,14 +109,16 @@ export default function NotificationsPage() {
                 <h2 className="text-lg font-semibold pb-1">Notifications</h2>
                 <p className="text-sm text-default-500">Transaction updates and alerts</p>
               </div>
-              <Button
-                isIconOnly
-                variant="light"
-                className="p-3 bg-danger/10 rounded-full"
-                onClick={handleDeleteAllNotifications}
-              >
-                <Trash2 className="w-6 h-6 text-danger" />
-              </Button>
+              {notifications.length > 0 && (
+                <Button
+                  isIconOnly
+                  variant="light"
+                  className="p-3 bg-danger/10 rounded-full"
+                  onClick={handleDeleteAllNotifications}
+                >
+                  <Trash2 className="w-6 h-6 text-danger" />
+                </Button>
+              )}
             </div>
 
             {loading ? (
