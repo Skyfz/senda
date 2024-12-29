@@ -172,21 +172,35 @@ export async function POST(req: NextRequest) {
 
     const currentTime = new Date().toISOString();
 
-    // Update notification format to match send notifications
+    // First, fetch the transaction details
+    const transaction = await db.collection('transactions').findOne(
+      { _id: new ObjectId(notification.TransactionReference) }
+    );
+
+    if (!transaction) {
+      console.error('Transaction not found:', notification.TransactionReference);
+      return NextResponse.json(
+        { error: 'Transaction not found' },
+        { status: 404 }
+      );
+    }
+
+    // Update notification format with transaction details
     const notificationWithTimestamp = {
       TransactionId: notification.TransactionId,
       TransactionReference: notification.TransactionReference,
-      Amount: notification.Amount, // Convert to number for UI
-      Status: notification.Status.toLowerCase(), // Ensure consistent case
+      Amount: parseFloat(notification.Amount.toString()),
+      Status: notification.Status.toLowerCase(),
       created_at: currentTime,
       updated_at: currentTime,
       transaction_type: 'deposit',
-      // Add note field for UI
-      note: `${notification.BankName || 'Bank'} deposit ${notification.StatusMessage ? `- ${notification.StatusMessage}` : ''}`,
-      // Add required email fields for UI
-      to_email: notification.Optional2 || '', // Assuming Optional2 contains email
+      // Include user information from transaction
       from_email: notification.BankName || 'Bank Deposit',
-      // Other fields...
+      to_email: transaction.to_email || transaction.from_email || '', // Get email from transaction
+      from_user_id: null, // Bank deposits come from external source
+      to_user_id: transaction.to_user_id || transaction.from_user_id, // Get user ID from transaction
+      note: `${notification.BankName || 'Bank'} deposit ${notification.StatusMessage ? `- ${notification.StatusMessage}` : ''}`,
+      // Bank details
       from_bank: notification.BankName || 'Unknown Bank',
       from_account: notification.MaskedAccountNumber || 'Unknown Account',
       status_message: notification.StatusMessage || '',
@@ -194,8 +208,9 @@ export async function POST(req: NextRequest) {
       is_test: notification.IsTest,
       currency: notification.CurrencyCode,
       smart_indicators: notification.SmartIndicators || '',
-      user_id: notification.Optional1 || '', // Assuming Optional1 contains userId
-      user_email: notification.Optional2 || '' // Assuming Optional2 contains email
+      // Additional transaction details if needed
+      fee: transaction.fee,
+      net_amount: transaction.net_amount
     };
 
     await db.collection('notifications').insertOne(notificationWithTimestamp);
