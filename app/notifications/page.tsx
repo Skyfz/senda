@@ -70,12 +70,12 @@ export default function NotificationsPage() {
   const getNotificationIcon = (notification: Notification) => {
     if (notification.transaction_type === 'transfer') {
       return notification.to_email === globalUser?.email ? 
-        <ArrowDownLeft className="w-5 h-5 text-success" /> :
-        <ArrowUpRight className="w-5 h-5 text-success" />
+        <ArrowDownLeft className="w-6 h-6 text-success" /> :
+        <ArrowUpRight className="w-6 h-6 text-success" />
     }
     return notification.Status === 'complete' ? 
-      <Check className="w-5 h-5 text-success" /> :
-      <AlertCircle className="w-5 h-5 text-warning" />
+      <Check className="w-6 h-6 text-success" /> :
+      <AlertCircle className="w-6 h-6 text-warning" />
   }
 
   const handleDeleteAllNotifications = async () => {
@@ -106,8 +106,8 @@ export default function NotificationsPage() {
           <CardBody className="py-5 px-4">
             <div className="flex justify-between items-center mb-4 px-2">
               <div>
-                <h2 className="text-lg font-semibold pb-1">Notifications</h2>
-                <p className="text-sm text-default-500">Transaction updates and alerts</p>
+                <h2 className="text-xl font-semibold pb-1">Notifications</h2>
+                <p className="text-md text-default-500">Transaction updates and alerts</p>
               </div>
               {notifications.length > 0 && (
                 <Button
@@ -131,28 +131,27 @@ export default function NotificationsPage() {
                   <Card key={notification._id} className="w-full">
                     <CardBody className="p-3">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-full ${
+                        <div className={`p-3 rounded-full ${
                           notification.Status === 'complete' ? 'bg-success/10' : 'bg-warning/10'
                         }`}>
                           {getNotificationIcon(notification)}
                         </div>
                         <div className="flex-1 space-y-2">
-                          <p className="text-sm font-medium">
-                            {getNotificationTitle(notification)}
-                          </p>
-                          <div className="flex justify-between items-center">
+                            <p className="text-sm font-medium">
+                                {getNotificationTitle(notification)}
+                            </p>
+                            
+                            {notification.note && (
+                                <p className="text-xs text-default-500">
+                                <span className="font-medium">Note: </span>
+                                {notification.note}
+                                </p>
+                            )}
                             <p className="text-xs text-default-400">
-                              {new Date(notification.created_at).toLocaleString()}
+                            {new Date(notification.created_at).toLocaleString()}
                             </p>
-                          </div>
-                          {notification.note && (
-                            <p className="text-xs text-default-500">
-                              <span className="font-medium">Note: </span>
-                              {notification.note}
-                            </p>
-                          )}
                         </div>
-                        <p className="text-lg text-success font-semibold">
+                        <p className="text-xl text-success font-semibold">
                           R{notification.Amount}
                         </p>
                       </div>
