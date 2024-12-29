@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // 2. Create transaction record
+    // 2. Create transaction record with notification fields
     const transaction = await db.collection("transactions").insertOne({
       _id: new ObjectId(),
       transaction_id: transactionId,
@@ -49,6 +49,26 @@ export async function POST(req: Request) {
       created_at: timestamp,
       updated_at: timestamp
     })
+
+    // Create notification record with more details
+    const notification = {
+      TransactionId: transactionId,
+      TransactionReference: transaction.insertedId.toString(),
+      Amount: total,
+      Status: 'processing',
+      created_at: timestamp,
+      updated_at: timestamp,
+      transaction_type: 'transfer',
+      from_email: senderEmail,
+      to_email: recipientEmail,
+      note: note,
+      from_user_id: senderId,
+      to_user_id: recipientId
+    }
+
+    console.log('Created notification:', notification);
+
+    await db.collection('notifications').insertOne(notification)
 
     // 3. Update sender's wallet (deduct amount)
     await db.collection("wallets").updateOne(
@@ -83,7 +103,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // 5. Mark transaction as complete
+    // 5. Mark transaction as complete and update notification
     await db.collection("transactions").updateOne(
       { _id: transaction.insertedId },
       { 
@@ -93,6 +113,17 @@ export async function POST(req: Request) {
           is_processed: true,
           processed_at: timestamp
         } 
+      }
+    )
+
+    // Update notification status
+    await db.collection('notifications').updateOne(
+      { TransactionId: transactionId },
+      { 
+        $set: { 
+          Status: 'complete',
+          processed_at: timestamp
+        }
       }
     )
 

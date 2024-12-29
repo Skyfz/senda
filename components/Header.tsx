@@ -39,7 +39,13 @@ export default function Header() {
       </div>
       <div className="flex items-center gap-6">
         {/* <AvatarDropdown className=""/> */}
-        <Button onClick={demoAction.onClick} variant='flat' color='default' isIconOnly={true} radius='full'>
+        <Button 
+          onClick={() => router.push('/notifications')} 
+          variant='flat' 
+          color='default' 
+          isIconOnly={true} 
+          radius='full'
+        >
           <Bell size={24} />
         </Button>
       </div>
